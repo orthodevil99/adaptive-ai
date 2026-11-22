@@ -1,0 +1,31 @@
+# Render blueprint for the Adaptive AI backend (FastAPI).
+# Deploy: Render dashboard -> New -> Blueprint -> connect orthodevil99/adaptive-ai
+# Then fill in the two sync:false secrets in the Render dashboard when prompted:
+#   GROQ_API_KEY  - a FRESH Groq key (console.groq.com/keys). Never commit it.
+#   APP_API_KEYS  - invent any long random string; the frontend must send the
+#                   same value as VITE_API_KEY. Backend refuses to start in
+#                   production without it.
+services:
+  - type: web
+    name: adaptive-ai-backend
+    runtime: python
+    rootDir: adaptive-ai-backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: APP_ENV
+        value: production
+      - key: PROVIDER
+        value: groq
+      - key: GROQ_API_KEY
+        sync: false
+      - key: APP_API_KEYS
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://adaptive-ai-web-xi.vercel.app,http://localhost:5173
+      - key: DATABASE_URL
+        value: sqlite:///./data/app.db
