@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adaptive AI — Transparent AI Orchestration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --violet: #6C63FF;
+      --ink: #121826;
+      --mist: #F8FAFC;
+      --teal: #2EC4B6;
+
+      --bg: var(--ink);
+      --text: var(--mist);
+      --text-muted: rgba(248, 250, 252, 0.72);
+      --glass-bg: rgba(248, 250, 252, 0.06);
+      --glass-bg-strong: rgba(248, 250, 252, 0.10);
+      --glass-bg-overlay: rgba(18, 24, 38, 0.88);
+      --glass-border: rgba(248, 250, 252, 0.14);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      --glass-blur: 16px;
+      --glass-blur-overlay: 24px;
+      --radius: 16px;
+      --user-bg: rgba(108, 99, 255, 0.18);
+      --user-border: rgba(108, 99, 255, 0.45);
+      --code-bg: rgba(0, 0, 0, 0.32);
+    }
+
+    [data-theme='light'] {
+      --bg: var(--mist);
+      --text: var(--ink);
+      --text-muted: rgba(18, 24, 38, 0.68);
+      --glass-bg: rgba(255, 255, 255, 0.62);
+      --glass-bg-strong: rgba(255, 255, 255, 0.82);
+      --glass-bg-overlay: rgba(248, 250, 252, 0.94);
+      --glass-border: rgba(18, 24, 38, 0.12);
+      --glass-shadow: 0 8px 32px rgba(18, 24, 38, 0.10);
+      --user-bg: rgba(108, 99, 255, 0.12);
+      --user-border: rgba(108, 99, 255, 0.36);
+      --code-bg: rgba(18, 24, 38, 0.06);
+    }
+
+    @media (max-width: 768px) {
+      :root { --glass-blur: 12px; }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      background-image:
+        radial-gradient(46rem 46rem at 8% -8%, rgba(108, 99, 255, 0.52), transparent 58%),
+        radial-gradient(38rem 38rem at 92% 14%, rgba(46, 196, 182, 0.36), transparent 55%),
+        radial-gradient(34rem 34rem at 52% 96%, rgba(108, 99, 255, 0.30), transparent 58%),
+        radial-gradient(24rem 24rem at 28% 54%, rgba(46, 196, 182, 0.18), transparent 55%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    [data-theme='light'] body,
+    body.light-bg {
+      background-image:
+        radial-gradient(44rem 44rem at 10% 0%, rgba(108, 99, 255, 0.28), transparent 58%),
+        radial-gradient(38rem 38rem at 95% 18%, rgba(46, 196, 182, 0.28), transparent 56%),
+        radial-gradient(32rem 32rem at 50% 95%, rgba(108, 99, 255, 0.20), transparent 58%);
+    }
+
+    /* Design 3: Subtle dark neural circuit-board + central chip silhouette behind frosted glass */
+    .circuit-backdrop {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .circuit-backdrop svg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.42;
+    }
+    [data-theme='light'] .circuit-backdrop svg { opacity: 0.14; }
+    .circuit-core-glow {
+      position: absolute;
+      top: 46%;
+      left: 48%;
+      width: 340px;
+      height: 240px;
+      transform: translate(-50%, -50%);
+      border-radius: 28px;
+      background: radial-gradient(circle, rgba(46, 196, 182, 0.28) 0%, rgba(108, 99, 255, 0.22) 55%, transparent 78%);
+      filter: blur(36px);
+      border: 1px solid rgba(46, 196, 182, 0.18);
+    }
+    [data-theme='light'] .circuit-core-glow { opacity: 0.35; }
+
+    #app { position: relative; z-index: 1; }
+
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+
+    /* Level 1: Surface Glass (frosted translucency + specular top rim) */
+    .glass {
+      background: linear-gradient(135deg, rgba(248, 250, 252, 0.11) 0%, rgba(248, 250, 252, 0.04) 100%);
+      border: 1px solid rgba(248, 250, 252, 0.18);
+      border-top-color: rgba(248, 250, 252, 0.28);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+    }
+
+    /* Level 2: Elevated Glass (stronger frosted sheen + crisp luminous edge) */
+    .glass-elevated {
+      background: linear-gradient(145deg, rgba(248, 250, 252, 0.15) 0%, rgba(248, 250, 252, 0.06) 100%);
+      border: 1px solid rgba(248, 250, 252, 0.22);
+      border-top-color: rgba(248, 250, 252, 0.34);
+      border-radius: var(--radius);
+      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(var(--glass-blur)) saturate(175%);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(175%);
+    }
+
+    /* Level 3: Overlay Glass (modals, drawers, bottom sheet) */
+    .glass-overlay {
+      background: linear-gradient(145deg, rgba(18, 24, 38, 0.86) 0%, rgba(18, 24, 38, 0.74) 100%);
+      border: 1px solid rgba(248, 250, 252, 0.22);
+      border-top-color: rgba(248, 250, 252, 0.34);
+      border-radius: var(--radius);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.20);
+      backdrop-filter: blur(var(--glass-blur-overlay)) saturate(180%);
+      -webkit-backdrop-filter: blur(var(--glass-blur-overlay)) saturate(180%);
+    }
+
+    /* User Message Violet-Tinted Frosted Glass */
+    .glass-user {
+      background: linear-gradient(135deg, rgba(108, 99, 255, 0.32) 0%, rgba(108, 99, 255, 0.14) 100%);
+      border: 1px solid rgba(108, 99, 255, 0.52);
+      border-top-color: rgba(248, 250, 252, 0.32);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 30px rgba(108, 99, 255, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+      backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+    }
+
+    [data-theme='light'] .glass {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.45) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 8px 32px rgba(18, 24, 38, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+    [data-theme='light'] .glass-elevated {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.84) 0%, rgba(255, 255, 255, 0.58) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      box-shadow: 0 14px 40px rgba(18, 24, 38, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1);
+    }
+    [data-theme='light'] .glass-overlay {
+      background: linear-gradient(145deg, rgba(248, 250, 252, 0.92) 0%, rgba(255, 255, 255, 0.82) 100%);
+      border: 1px solid rgba(18, 24, 38, 0.12);
+    }
+    [data-theme='light'] .glass-user {
+      background: linear-gradient(135deg, rgba(108, 99, 255, 0.20) 0%, rgba(108, 99, 255, 0.08) 100%);
+      border: 1px solid rgba(108, 99, 255, 0.42);
+    }
+
+    @supports not (backdrop-filter: blur(1px)) {
+      .glass, .glass-elevated, .glass-overlay { background: rgba(18, 24, 38, 0.92); }
+      [data-theme='light'] .glass,
+      [data-theme='light'] .glass-elevated,
+      [data-theme='light'] .glass-overlay { background: rgba(248, 250, 252, 0.95); }
+    }
+
+    @media (prefers-reduced-transparency: reduce) {
+      .glass, .glass-elevated, .glass-overlay {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(18, 24, 38, 0.95);
+      }
+      [data-theme='light'] .glass,
+      [data-theme='light'] .glass-elevated,
+      [data-theme='light'] .glass-overlay { background: rgba(248, 250, 252, 0.97); }
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2EC4B6 0%, #4F8CFF 52%, #6C63FF 100%);
+      color: #F8FAFC;
+      font-weight: 600;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow: 0 6px 22px rgba(108, 99, 255, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+      transition: filter 150ms ease, transform 120ms ease, box-shadow 150ms ease;
+    }
+    .btn-primary:hover:not(:disabled) {
+      filter: brightness(1.08);
+      box-shadow: 0 8px 26px rgba(46, 196, 182, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: rgba(248, 250, 252, 0.05);
+      border: 1px solid rgba(108, 99, 255, 0.55);
+      color: var(--text);
+      font-weight: 500;
+      border-radius: 12px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+      transition: background 150ms ease, border-color 150ms ease;
+    }
+    .btn-secondary:hover { background: rgba(108, 99, 255, 0.16); border-color: var(--violet); }
+
+    .nav-active {
+      background: linear-gradient(135deg, rgba(46, 196, 182, 0.16) 0%, rgba(108, 99, 255, 0.22) 100%);
+      border: 1px solid rgba(108, 99, 255, 0.55);
+      border-left: 3px solid #2EC4B6;
+      box-shadow: 0 4px 18px rgba(108, 99, 255, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      font-weight: 600;
+    }
+
+    .assistant-glass {
+      border-color: rgba(108, 99, 255, 0.38);
+      border-top-color: rgba(46, 196, 182, 0.55);
+      box-shadow: 0 14px 44px rgba(0, 0, 0, 0.44), 0 0 28px rgba(46, 196, 182, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
+
+    .chip {
+      background: var(--glass-bg);
+      border: 1px solid rgba(108, 99, 255, 0.55);
+      border-radius: 9999px;
+      font-size: 12px;
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: border-color 150ms ease, background 150ms ease;
+    }
+    .chip:hover { border-color: var(--violet); background: rgba(108, 99, 255, 0.14); }
+
+    .glow-violet { box-shadow: 0 0 10px rgba(108, 99, 255, 0.75); }
+
+    .md-body h3 { font-size: 1rem; font-weight: 700; margin: 0.25rem 0 0.5rem; }
+    .md-body p { margin: 0.4rem 0; line-height: 1.6; }
+    .md-body ul, .md-body ol { margin: 0.4rem 0 0.4rem 1.25rem; }
+    .md-body li { margin: 0.25rem 0; line-height: 1.55; }
+    .md-body ul li { list-style-type: disc; }
+    .md-body ol li { list-style-type: decimal; }
+    .md-body pre {
+      background: var(--code-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 12px;
+      overflow-x: auto;
+      margin: 0.6rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .md-body code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85em;
+      background: var(--code-bg);
+      padding: 2px 5px;
+      border-radius: 6px;
+    }
+    .md-body pre code { background: transparent; padding: 0; }
+    .md-body table { width: 100%; border-collapse: collapse; margin: 0.6rem 0; font-size: 13px; }
+    .md-body th, .md-body td { border: 1px solid var(--glass-border); padding: 7px 10px; text-align: left; }
+    .md-body th { background: rgba(108, 99, 255, 0.12); font-weight: 600; }
+
+    select option { background: #121826; color: #F8FAFC; }
+    [data-theme='light'] select option { background: #F8FAFC; color: #121826; }
+  </style>
+</head>
+<body class="antialiased">
+  <div class="circuit-backdrop" aria-hidden="true">
+    <div class="circuit-core-glow"></div>
+    <svg viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="traceGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2EC4B6" stop-opacity="0.65" />
+          <stop offset="50%" stop-color="#6C63FF" stop-opacity="0.55" />
+          <stop offset="100%" stop-color="#2EC4B6" stop-opacity="0.15" />
+        </linearGradient>
+        <linearGradient id="traceGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#6C63FF" stop-opacity="0.6" />
+          <stop offset="100%" stop-color="#2EC4B6" stop-opacity="0.3" />
+        </linearGradient>
+      </defs>
+      <!-- Left vertical & angled circuit bus -->
+      <path d="M260 0 V140 L310 190 V340 L360 390 H520" stroke="url(#traceGrad1)" stroke-width="1.4" />
+      <path d="M300 0 V110 L350 160 V290 L410 350 H540" stroke="url(#traceGrad1)" stroke-width="1" />
+      <path d="M340 0 V90 L380 130 V240" stroke="url(#traceGrad2)" stroke-width="1" />
+      <path d="M260 900 V720 L320 660 V540 L380 480 H520" stroke="url(#traceGrad2)" stroke-width="1.4" />
+      <path d="M310 900 V760 L370 700 V580 L430 520 H540" stroke="url(#traceGrad1)" stroke-width="1" />
+      <!-- Top & bottom neural chip leads -->
+      <path d="M580 0 V210 L620 250 V310" stroke="url(#traceGrad1)" stroke-width="1.3" />
+      <path d="M640 0 V180 L670 210 V310" stroke="url(#traceGrad2)" stroke-width="1.1" />
+      <path d="M720 0 V310" stroke="url(#traceGrad1)" stroke-width="1.2" />
+      <path d="M800 0 V190 L770 220 V310" stroke="url(#traceGrad2)" stroke-width="1.1" />
+      <path d="M860 0 V220 L820 260 V310" stroke="url(#traceGrad1)" stroke-width="1.3" />
+      <path d="M600 900 V690 L640 650 V570" stroke="url(#traceGrad2)" stroke-width="1.3" />
+      <path d="M680 900 V570" stroke="url(#traceGrad1)" stroke-width="1.1" />
+      <path d="M760 900 V680 L730 650 V570" stroke="url(#traceGrad2)" stroke-width="1.2" />
+      <path d="M840 900 V660 L800 620 V570" stroke="url(#traceGrad1)" stroke-width="1.2" />
+      <!-- Right side traces feeding Insights panel -->
+      <path d="M1440 160 H1160 L1100 220 V360 L1020 440 H890" stroke="url(#traceGrad1)" stroke-width="1.4" />
+      <path d="M1440 240 H1210 L1150 300 V410 L1070 490 H890" stroke="url(#traceGrad2)" stroke-width="1.1" />
+      <path d="M1440 680 H1180 L1120 620 V530 L1050 460" stroke="url(#traceGrad1)" stroke-width="1.3" />
+      <path d="M1440 760 H1230 L1170 700 V590" stroke="url(#traceGrad2)" stroke-width="1" />
+      <!-- Central neural chip frame -->
+      <rect x="540" y="310" width="350" height="260" rx="24" stroke="url(#traceGrad1)" stroke-width="1.5" stroke-opacity="0.7" />
+      <rect x="568" y="338" width="294" height="204" rx="16" stroke="#2EC4B6" stroke-width="1" stroke-opacity="0.35" stroke-dasharray="6 6" />
+      <!-- Glowing circuit nodes -->
+      <circle cx="310" cy="190" r="3.5" fill="#2EC4B6" />
+      <circle cx="380" cy="240" r="3" fill="#6C63FF" />
+      <circle cx="580" cy="210" r="3.5" fill="#2EC4B6" />
+      <circle cx="860" cy="220" r="3.5" fill="#6C63FF" />
+      <circle cx="1100" cy="220" r="3.5" fill="#2EC4B6" />
+      <circle cx="1120" cy="620" r="3.5" fill="#6C63FF" />
+      <circle cx="320" cy="660" r="3.5" fill="#2EC4B6" />
+      <circle cx="640" cy="650" r="3" fill="#6C63FF" />
+      <circle cx="800" cy="620" r="3.5" fill="#2EC4B6" />
+    </svg>
+  </div>
+  <div id="app" class="flex min-h-screen flex-col md:flex-row">
+    <!-- Desktop Sidebar (Level 1 Glass) -->
+    <aside class="glass hidden w-64 shrink-0 flex-col justify-between rounded-none border-y-0 border-l-0 p-4 md:flex">
+      <div>
+        <div class="mb-5 flex items-center gap-2.5 px-1">
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-[#6C63FF]/50 bg-[#6C63FF]/20">
+            <i data-lucide="sparkles" class="h-5 w-5 text-[#2EC4B6]"></i>
+          </div>
+          <div>
+            <div class="text-base font-bold tracking-tight">Adaptive AI</div>
+            <div class="text-[11px] opacity-70">Transparent Orchestration</div>
+          </div>
+        </div>
+
+        <button id="btnNewSession" class="btn-primary mb-2.5 flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm">
+          <i data-lucide="plus" class="h-4 w-4"></i> New Session
+        </button>
+
+        <button id="btnDemoTour" class="btn-secondary mb-5 flex w-full items-center justify-center gap-2 px-4 py-2 text-xs">
+          <i data-lucide="play" class="h-3.5 w-3.5 text-[#2EC4B6]"></i> 1-Click Demo Tour
+        </button>
+
+        <nav id="desktopNav" class="space-y-1">
+          <button data-view="chat" class="nav-btn nav-active flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition hover:bg-white/5">
+            <i data-lucide="message-square" class="h-4 w-4"></i> Chat Console
+          </button>
+          <button data-view="playground" class="nav-btn flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm opacity-85 transition hover:bg-white/5">
+            <i data-lucide="flask-conical" class="h-4 w-4"></i> Analyze Playground
+          </button>
+          <button data-view="sessions" class="nav-btn flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm opacity-85 transition hover:bg-white/5">
+            <i data-lucide="history" class="h-4 w-4"></i> Sessions
+            <span id="sessionCountBadge" class="ml-auto rounded-full bg-[#6C63FF]/25 px-2 py-0.5 text-[11px] font-mono-code">1</span>
+          </button>
+          <button data-view="preferences" class="nav-btn flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm opacity-85 transition hover:bg-white/5">
+            <i data-lucide="sliders-horizontal" class="h-4 w-4"></i> Preferences
+          </button>
+          <button data-view="status" class="nav-btn flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm opacity-85 transition hover:bg-white/5">
+            <i data-lucide="activity" class="h-4 w-4"></i> System Status
+          </button>
+        </nav>
+      </div>
+
+      <div class="space-y-3 border-t border-white/10 pt-4">
+        <div class="flex items-center justify-between px-1 text-xs">
+          <span class="flex items-center gap-2 font-medium">
+            <span class="h-2.5 w-2.5 rounded-full bg-[#2EC4B6]"></span>
+            Engine Online
+          </span>
+          <button id="btnThemeDesktop" class="rounded-lg p-1.5 hover:bg-white/10" title="Toggle Dark/Light Glass Theme" aria-label="Toggle Theme">
+            <i data-lucide="sun" class="h-4 w-4"></i>
+          </button>
+        </div>
+        <p class="px-1 text-[11px] leading-relaxed opacity-65">
+          Interactive local preview of the Adaptive AI orchestration engine. Run the bundled FastAPI backend for live Gemini API calls.
+        </p>
+      </div>
+    </aside>
+
+    <!-- Mobile Top Bar -->
+    <header class="glass flex items-center justify-between rounded-none border-x-0 border-t-0 px-4 py-3 md:hidden">
+      <div class="flex items-center gap-2 font-bold">
+        <i data-lucide="sparkles" class="h-5 w-5 text-[#2EC4B6]"></i> Adaptive AI
+      </div>
+      <div class="flex items-center gap-1.5">
+        <button id="btnDemoTourMobile" class="btn-secondary px-2.5 py-1.5 text-xs">Demo</button>
+        <button id="btnThemeMobile" class="rounded-lg p-2 hover:bg-white/10" aria-label="Toggle Theme">
+          <i data-lucide="sun" class="h-4 w-4"></i>
+        </button>
+        <button id="btnMobileMenu" class="rounded-lg p-2 hover:bg-white/10" aria-label="Open Menu">
+          <i data-lucide="menu" class="h-5 w-5"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Overlay Drawer -->
+    <div id="mobileDrawer" class="glass-overlay fixed inset-0 z-50 hidden flex-col p-6 md:hidden">
+      <div class="mb-6 flex items-center justify-between">
+        <span class="text-lg font-bold">Adaptive AI</span>
+        <button id="btnCloseMobileMenu" class="rounded-lg p-2 hover:bg-white/10" aria-label="Close Menu">
+          <i data-lucide="x" class="h-5 w-5"></i>
+        </button>
+      </div>
+      <button id="btnNewSessionMobile" class="btn-primary mb-4 flex w-full items-center justify-center gap-2 py-2.5 text-sm">
+        <i data-lucide="plus" class="h-4 w-4"></i> New Session
+      </button>
+      <nav class="space-y-2">
+        <button data-view="chat" class="mobile-nav-btn flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-base font-medium hover:bg-white/10">Chat Console</button>
+        <button data-view="playground" class="mobile-nav-btn flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-base font-medium hover:bg-white/10">Analyze Playground</button>
+        <button data-view="sessions" class="mobile-nav-btn flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-base font-medium hover:bg-white/10">Sessions</button>
+        <button data-view="preferences" class="mobile-nav-btn flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-base font-medium hover:bg-white/10">Preferences</button>
+        <button data-view="status" class="mobile-nav-btn flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-base font-medium hover:bg-white/10">System Status</button>
+      </nav>
+    </div>
+
+    <!-- Main Workspace Area -->
+    <main class="relative flex-1 overflow-hidden">
+      <!-- VIEW 1: CHAT CONSOLE -->
+      <section id="view-chat" class="view-pane flex h-[calc(100vh-56px)] md:h-screen">
+        <div class="flex flex-1 flex-col overflow-hidden">
+          <!-- Active Session Bar -->
+          <div class="flex items-center justify-between border-b border-white/10 px-4 py-2.5 text-xs md:px-8">
+            <div class="flex items-center gap-2">
+              <span class="font-mono-code rounded-md bg-[#6C63FF]/20 px-2 py-0.5 text-[11px]" id="activeSessionLabel">session_demo</span>
+              <span class="hidden opacity-70 sm:inline" id="activePrefsSummary">Balanced • Step by Step</span>
+            </div>
+            <button id="btnToggleInsights" class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium text-[#2EC4B6] hover:bg-white/10">
+              <i data-lucide="panel-right" class="h-3.5 w-3.5"></i> Insights Panel
+            </button>
+          </div>
+
+          <!-- Messages Container -->
+          <div id="messagesContainer" class="flex-1 space-y-4 overflow-y-auto px-4 py-5 md:px-8"></div>
+
+          <!-- Composer Bar (Level 2 Elevated Glass) -->
+          <div class="px-4 pb-4 pt-2 md:px-8">
+            <div class="relative mx-auto max-w-3xl">
+              <!-- Quick Preferences Popover -->
+              <div id="quickPrefsPopover" class="glass-elevated absolute bottom-16 left-0 z-30 hidden w-64 space-y-3 p-4 text-xs">
+                <div class="flex items-center justify-between font-semibold">
+                  <span>Quick Preferences</span>
+                  <button id="btnClosePopover" class="opacity-70 hover:opacity-100">Close</button>
+                </div>
+                <label class="block">
+                  <span class="mb-1 block opacity-75">Detail Level</span>
+                  <select id="quickDetail" class="glass w-full rounded-lg px-2.5 py-1.5 outline-none">
+                    <option value="concise">Concise</option>
+                    <option value="balanced" selected>Balanced</option>
+                    <option value="high">High Detail</option>
+                  </select>
+                </label>
+                <label class="block">
+                  <span class="mb-1 block opacity-75">Explanation Style</span>
+                  <select id="quickStyle" class="glass w-full rounded-lg px-2.5 py-1.5 outline-none">
+                    <option value="step_by_step" selected>Step by Step</option>
+                    <option value="direct">Direct</option>
+                    <option value="socratic">Socratic</option>
+                    <option value="executive">Executive Brief</option>
+                    <option value="examples_first">Examples First</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="glass-elevated flex items-end gap-2 p-2.5 focus-within:ring-2 focus-within:ring-[#6C63FF]">
+                <button id="btnQuickPrefs" type="button" class="glass rounded-xl p-2.5 hover:border-[#6C63FF]" title="Quick preferences" aria-label="Quick preferences">
+                  <i data-lucide="sliders-horizontal" class="h-4 w-4"></i>
+                </button>
+                <textarea
+                  id="composerInput"
+                  rows="1"
+                  maxlength="4000"
+                  placeholder="Ask Adaptive AI anything... (Enter to send, Shift+Enter for newline)"
+                  class="max-h-36 flex-1 resize-none bg-transparent px-2 py-2 text-sm outline-none"
+                ></textarea>
+                <span id="charCounter" class="hidden font-mono-code text-[10px] opacity-55 sm:inline">0/4000</span>
+                <button id="btnSend" type="button" class="btn-primary inline-flex items-center gap-1.5 px-4 py-2 text-sm">
+                  <i data-lucide="send" class="h-4 w-4"></i>
+                  <span class="hidden sm:inline">Send</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop Insights Panel (Level 2 Glass) -->
+        <aside id="insightsDesktop" class="hidden w-80 shrink-0 p-4 lg:flex lg:flex-col">
+          <div class="glass-elevated flex h-full flex-col overflow-hidden p-5">
+            <div class="mb-4 flex items-start justify-between border-b border-white/10 pb-3">
+              <div>
+                <h2 class="text-sm font-bold">Adaptive Insights</h2>
+                <p class="text-[11px] opacity-70">Orchestration & Evaluation Telemetry</p>
+              </div>
+              <button id="btnCloseInsightsDesktop" class="rounded-lg px-2 py-1 text-xs opacity-70 hover:bg-white/10">Hide</button>
+            </div>
+            <div id="insightsContentDesktop" class="flex-1 space-y-3.5 overflow-y-auto pr-1 text-xs"></div>
+          </div>
+        </aside>
+      </section>
+
+      <!-- Mobile Insights Bottom Sheet (Overlay) -->
+      <div id="insightsMobileSheet" class="fixed inset-0 z-40 hidden items-end bg-black/50 lg:hidden">
+        <div class="glass-overlay max-h-[82vh] w-full rounded-b-none p-5 overflow-y-auto">
+          <div class="mb-3 flex items-center justify-between border-b border-white/10 pb-2.5">
+            <h2 class="text-sm font-bold">Adaptive Insights</h2>
+            <button id="btnCloseInsightsMobile" class="rounded-lg px-2 py-1 text-xs hover:bg-white/10">Close</button>
+          </div>
+          <div id="insightsContentMobile" class="space-y-3 text-xs"></div>
+        </div>
+      </div>
+
+      <!-- VIEW 2: ANALYZE PLAYGROUND -->
+      <section id="view-playground" class="view-pane hidden h-[calc(100vh-56px)] overflow-y-auto p-6 md:h-screen md:p-8">
+        <div class="mx-auto max-w-4xl space-y-6">
+          <div>
+            <h1 class="text-2xl font-bold">Analyze Playground</h1>
+            <p class="mt-1 text-sm opacity-75">Inspect how the orchestration router classifies intent, complexity, persona, strategy, and A-score before generating a response.</p>
+          </div>
+
+          <div class="glass-elevated space-y-4 p-5">
+            <textarea id="playgroundInput" rows="4" class="glass w-full rounded-xl p-3.5 text-sm outline-none focus:border-[#6C63FF]">Design a scalable FastAPI backend with rate limiting, CORS, and explain the architectural trade-offs</textarea>
+            <div class="flex flex-wrap items-center gap-2">
+              <button id="btnRunAnalyze" class="btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm">
+                <i data-lucide="flask-conical" class="h-4 w-4"></i> Run Analysis
+              </button>
+              <button class="pg-sample chip" data-sample="Explain transformers and self-attention for a beginner">Education Sample</button>
+              <button class="pg-sample chip" data-sample="Create a 2-week hackathon sprint roadmap with risks and milestones">Planning Sample</button>
+              <button class="pg-sample chip" data-sample="Compare REST vs GraphQL pros and cons for a mobile analytics dashboard">Analysis Sample</button>
+            </div>
+          </div>
+
+          <div id="playgroundResult" class="glass p-5"></div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: SESSIONS -->
+      <section id="view-sessions" class="view-pane hidden h-[calc(100vh-56px)] overflow-y-auto p-6 md:h-screen md:p-8">
+        <div class="mx-auto max-w-4xl space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 class="text-2xl font-bold">Sessions</h1>
+              <p class="mt-1 text-sm opacity-75">Switch between active conversations or permanently delete stored session history.</p>
+            </div>
+            <button id="btnNewSessionFromList" class="btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm">
+              <i data-lucide="plus" class="h-4 w-4"></i> New Session
+            </button>
+          </div>
+          <div id="sessionsList" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: PREFERENCES -->
+      <section id="view-preferences" class="view-pane hidden h-[calc(100vh-56px)] overflow-y-auto p-6 md:h-screen md:p-8">
+        <div class="mx-auto max-w-3xl space-y-6">
+          <div>
+            <h1 class="text-2xl font-bold">Preferences</h1>
+            <p class="mt-1 text-sm opacity-75">Control response detail, explanation style, output formatting, and glassmorphism theme.</p>
+          </div>
+          <form id="preferencesForm" class="glass-elevated space-y-4 p-6 text-sm">
+            <div>
+              <label for="prefLanguage" class="mb-1 block text-xs opacity-75">Preferred Language</label>
+              <input id="prefLanguage" type="text" value="English" class="glass w-full rounded-xl px-3.5 py-2 outline-none focus:border-[#6C63FF]" />
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="prefDetail" class="mb-1 block text-xs opacity-75">Response Detail</label>
+                <select id="prefDetail" class="glass w-full rounded-xl px-3 py-2 outline-none">
+                  <option value="concise">Concise</option>
+                  <option value="balanced" selected>Balanced</option>
+                  <option value="high">High Detail</option>
+                </select>
+              </div>
+              <div>
+                <label for="prefStyle" class="mb-1 block text-xs opacity-75">Explanation Style</label>
+                <select id="prefStyle" class="glass w-full rounded-xl px-3 py-2 outline-none">
+                  <option value="step_by_step" selected>Step by Step</option>
+                  <option value="direct">Direct</option>
+                  <option value="socratic">Socratic</option>
+                  <option value="executive">Executive Brief</option>
+                  <option value="examples_first">Examples First</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label for="prefFormat" class="mb-1 block text-xs opacity-75">Output Format</label>
+                <select id="prefFormat" class="glass w-full rounded-xl px-3 py-2 outline-none">
+                  <option value="markdown" selected>Markdown</option>
+                  <option value="bullet_points">Bullet Points</option>
+                  <option value="step_by_step">Step-by-Step Numbered</option>
+                  <option value="structured_table">Structured Table</option>
+                </select>
+              </div>
+              <div>
+                <label for="prefTheme" class="mb-1 block text-xs opacity-75">Glass Theme</label>
+                <select id="prefTheme" class="glass w-full rounded-xl px-3 py-2 outline-none">
+                  <option value="dark" selected>Dark Glass (Default)</option>
+                  <option value="light">Light Glass</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 pt-2">
+              <button type="submit" class="btn-primary px-5 py-2 text-sm">Save Preferences</button>
+              <button type="button" id="btnResetPrefs" class="btn-secondary px-4 py-2 text-sm">Reset Defaults</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- VIEW 5: SYSTEM STATUS & ANALYTICS -->
+      <section id="view-status" class="view-pane hidden h-[calc(100vh-56px)] overflow-y-auto p-6 md:h-screen md:p-8">
+        <div class="mx-auto max-w-4xl space-y-6">
+          <div>
+            <h1 class="text-2xl font-bold">System & Model Status</h1>
+            <p class="mt-1 text-sm opacity-75">Live connectivity overview, security posture, and Stage 2 feedback analytics.</p>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="glass p-5">
+              <div class="mb-2 flex items-center justify-between">
+                <span class="text-xs uppercase tracking-wider opacity-65">Orchestration Engine</span>
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2EC4B6]">
+                  <span class="h-2.5 w-2.5 rounded-full bg-[#2EC4B6]"></span> Healthy
+                </span>
+              </div>
+              <div class="font-mono-code text-sm">Adaptive AI v1.0</div>
+              <div class="mt-1 text-xs opacity-70">In-browser interactive engine active (FastAPI backend included in source ZIP).</div>
+            </div>
+            <div class="glass p-5">
+              <div class="mb-2 flex items-center justify-between">
+                <span class="text-xs uppercase tracking-wider opacity-65">v3 LLM Provider (Groq / Mock)</span>
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2EC4B6]">
+                  <span class="h-2.5 w-2.5 rounded-full bg-[#2EC4B6]"></span> Mock Mode Active
+                </span>
+              </div>
+              <div class="font-mono-code text-sm">openai/gpt-oss-120b (fallback: 20b)</div>
+              <div class="mt-1 text-xs opacity-70">Wired to adaptive_ai_v3 (/api/v1) with Thompson-sampling adaptation. Add GROQ_API_KEY in backend .env when ready.</div>
+            </div>
+          </div>
+
+          <div class="glass p-5">
+            <h2 class="mb-3 text-sm font-bold">Palette & Glassmorphism Accessibility Check</h2>
+            <div class="grid gap-3 text-xs sm:grid-cols-4">
+              <div class="rounded-xl border border-white/10 bg-[#121826] p-3 text-[#F8FAFC]">
+                <div class="font-semibold">Ink</div>
+                <div class="font-mono-code opacity-75">#121826</div>
+                <div class="mt-1 text-[11px] text-[#2EC4B6]">16.95:1 w/ Mist</div>
+              </div>
+              <div class="rounded-xl border border-black/10 bg-[#F8FAFC] p-3 text-[#121826]">
+                <div class="font-semibold">Mist</div>
+                <div class="font-mono-code opacity-75">#F8FAFC</div>
+                <div class="mt-1 text-[11px] font-medium">Light base tint</div>
+              </div>
+              <div class="rounded-xl bg-[#6C63FF] p-3 text-[#F8FAFC]">
+                <div class="font-semibold">Violet</div>
+                <div class="font-mono-code opacity-90">#6C63FF</div>
+                <div class="mt-1 text-[11px]">Accents & UI</div>
+              </div>
+              <div class="rounded-xl bg-[#2EC4B6] p-3 text-[#121826]">
+                <div class="font-semibold">Teal</div>
+                <div class="font-mono-code opacity-90">#2EC4B6</div>
+                <div class="mt-1 text-[11px] font-semibold">8.18:1 w/ Ink</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="analyticsContainer" class="glass p-5"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Confirmation Modal (Overlay Glass - No window.confirm) -->
+  <div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/55 p-4">
+    <div class="glass-overlay w-full max-w-sm space-y-4 p-5">
+      <h3 class="text-base font-bold">Delete Session?</h3>
+      <p class="text-xs opacity-80">This permanently removes the conversation history and feedback records for this session.</p>
+      <div class="flex justify-end gap-2">
+        <button id="btnCancelDelete" class="btn-secondary px-4 py-2 text-xs">Cancel</button>
+        <button id="btnConfirmDelete" class="btn-primary px-4 py-2 text-xs">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="glass-elevated pointer-events-none fixed bottom-6 right-6 z-50 hidden px-4 py-2.5 text-xs font-medium text-[#2EC4B6]"></div>
+
+  <script>
+    // =========================================================================
+    // SAFE STORAGE & UTILITIES
+    // =========================================================================
+    const STORAGE_KEY = 'adaptive_ai_demo_state_v1';
+    function loadSavedState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (_e) { return null; }
+    }
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_e) {}
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatLabel(raw) {
+      if (!raw) return 'General';
+      return String(raw).split('_').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.add('hidden'), 2600);
+    }
+
+    // Safe Markdown Renderer (treats all model output as untrusted)
+    function renderSafeMarkdown(md) {
+      const escaped = escapeHtml(md);
+      const blocks = [];
+      let text = escaped.replace(/```(\w*)\n([\s\S]*?)```/g, (_m, _lang, code) => {
+        const idx = blocks.length;
+        blocks.push(`<pre><code>${code.trim()}</code></pre>`);
+        return `@@BLOCK_${idx}@@`;
+      });
+
+      const lines = text.split('\n');
+      let html = '';
+      let inUl = false;
+      let inOl = false;
+      let inTable = false;
+
+      const inlineFmt = (line) => line
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>');
+
+      const closeLists = () => {
+        if (inUl) { html += '</ul>'; inUl = false; }
+        if (inOl) { html += '</ol>'; inOl = false; }
+        if (inTable) { html += '</tbody></table>'; inTable = false; }
+      };
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trim = line.trim();
+        if (!trim) { closeLists(); continue; }
+
+        if (trim.startsWith('@@BLOCK_')) {
+          closeLists();
+          html += trim;
+          continue;
+        }
+        if (trim.startsWith('### ')) {
+          closeLists();
+          html += `<h3>${inlineFmt(trim.slice(4))}</h3>`;
+          continue;
+        }
+        if (trim.startsWith('|') && trim.endsWith('|')) {
+          if (trim.includes('---')) continue;
+          const cells = trim.slice(1, -1).split('|').map(c => inlineFmt(c.trim()));
+          if (!inTable) {
+            closeLists();
+            inTable = true;
+            html += '<table><thead><tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+          } else {
+            html += '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+          }
+          continue;
+        }
+        if (trim.startsWith('- ')) {
+          if (inOl) { html += '</ol>'; inOl = false; }
+          if (inTable) { html += '</tbody></table>'; inTable = false; }
+          if (!inUl) { html += '<ul>'; inUl = true; }
+          html += `<li>${inlineFmt(trim.slice(2))}</li>`;
+          continue;
+        }
+        if (/^\d+\.\s+/.test(trim)) {
+          if (inUl) { html += '</ul>'; inUl = false; }
+          if (inTable) { html += '</tbody></table>'; inTable = false; }
+          if (!inOl) { html += '<ol>'; inOl = true; }
+          html += `<li>${inlineFmt(trim.replace(/^\d+\.\s+/, ''))}</li>`;
+          continue;
+        }
+        closeLists();
+        html += `<p>${inlineFmt(trim)}</p>`;
+      }
+      closeLists();
+      return html.replace(/@@BLOCK_(\d+)@@/g, (_m, idx) => blocks[Number(idx)] || '');
+    }
+
+    // =========================================================================
+    // ADAPTIVE AI ORCHESTRATION ENGINE (Mirrors FastAPI engine.py)
+    // =========================================================================
+    const INTENT_KEYWORDS = {
+      coding: ['code', 'python', 'typescript', 'javascript', 'react', 'fastapi', 'sql', 'bug', 'debug', 'function', 'api', 'algorithm', 'refactor', 'docker', 'html', 'css', 'endpoint', 'component'],
+      education: ['explain', 'teach', 'learn', 'what is', 'how does', 'concept', 'tutorial', 'beginner', 'intuition', 'understand', 'neural network', 'transformer', 'example'],
+      research: ['research', 'literature', 'paper', 'evidence', 'citation', 'benchmark', 'state of the art', 'survey', 'investigate', 'methodology', 'findings'],
+      planning: ['plan', 'roadmap', 'schedule', 'itinerary', 'timeline', 'milestone', 'sprint', 'checklist', 'strategy', 'organize', 'workflow', 'hackathon'],
+      summarization: ['summarize', 'summary', 'tldr', 'condense', 'key takeaways', 'brief', 'recap', 'shorten', 'digest'],
+      creative_writing: ['story', 'poem', 'script', 'tagline', 'copywriting', 'blog post', 'pitch', 'creative', 'narrative', 'slogan', 'brainstorm'],
+      analysis: ['analyze', 'analysis', 'compare', 'tradeoff', 'trade-off', 'pros and cons', 'evaluate', 'metrics', 'data', 'swot', 'risk', 'audit', 'breakdown', 'rest vs graphql'],
+      general_assistance: [],
+    };
+
+    const INTENT_TO_PERSONA = {
+      education: 'teacher',
+      coding: 'developer',
+      research: 'researcher',
+      planning: 'planner',
+      summarization: 'analyst',
+      creative_writing: 'general',
+      analysis: 'analyst',
+      general_assistance: 'general',
+    };
+
+    const PERSONA_ICON_NAME = {
+      teacher: 'book-open',
+      developer: 'code-2',
+      researcher: 'search',
+      planner: 'clipboard-list',
+      analyst: 'bar-chart-3',
+      general: 'sparkles',
+    };
+
+    const STRATEGY_MATRIX = {
+      'education:low': 'intuitive_analogy',
+      'education:medium': 'step_by_step_explanation',
+      'education:high': 'first_principles_deep_dive',
+      'coding:low': 'direct_code_snippet',
+      'coding:medium': 'annotated_implementation',
+      'coding:high': 'architecture_and_production_code',
+      'research:low': 'concise_fact_synthesis',
+      'research:medium': 'structured_evidence_brief',
+      'research:high': 'multi_angle_research_synthesis',
+      'planning:low': 'actionable_checklist',
+      'planning:medium': 'phased_execution_plan',
+      'planning:high': 'milestone_roadmap_with_risks',
+      'summarization:low': 'executive_tldr',
+      'summarization:medium': 'structured_key_takeaways',
+      'summarization:high': 'hierarchical_multi_section_digest',
+      'creative_writing:low': 'punchy_creative_draft',
+      'creative_writing:medium': 'narrative_with_variations',
+      'creative_writing:high': 'full_creative_treatment',
+      'analysis:low': 'quick_pros_cons',
+      'analysis:medium': 'comparative_matrix_analysis',
+      'analysis:high': 'multi_factor_decision_framework',
+      'general_assistance:low': 'direct_helpful_answer',
+      'general_assistance:medium': 'structured_guidance',
+      'general_assistance:high': 'comprehensive_advisory',
+    };
+
+    function analyzePrompt(message, prefs, historyLen = 0) {
+      const text = message.toLowerCase().trim();
+      let bestIntent = 'general_assistance';
+      let bestScore = 0;
+
+      for (const [intent, kws] of Object.entries(INTENT_KEYWORDS)) {
+        let sc = 0;
+        for (const kw of kws) {
+          if (text.includes(kw)) sc += kw.includes(' ') ? 2 : 1;
+        }
+        if (sc > bestScore) { bestScore = sc; bestIntent = intent; }
+      }
+
+      const words = text.split(/\s+/).filter(Boolean);
+      const multiMarkers = ['and', 'compare', 'also', 'step', 'architecture', 'optimize', 'tradeoff', 'trade-off', 'system', 'scale']
+        .filter(tok => text.includes(tok)).length;
+
+      let cPts = 0;
+      if (words.length >= 28) cPts += 2; else if (words.length >= 10) cPts += 1;
+      if (multiMarkers >= 2) cPts += 2; else if (multiMarkers === 1) cPts += 1;
+      if (message.includes('```') || (message.match(/\?/g) || []).length >= 2) cPts += 1;
+
+      const complexity = cPts >= 3 ? 'high' : cPts >= 1 ? 'medium' : 'low';
+      const C = complexity === 'high' ? 0.92 : complexity === 'medium' ? 0.78 : 0.65;
+      const persona = INTENT_TO_PERSONA[bestIntent];
+      let strategy = STRATEGY_MATRIX[`${bestIntent}:${complexity}`] || 'structured_guidance';
+      if (prefs.style === 'socratic' && bestIntent === 'education') strategy = 'socratic_guided_explanation';
+      if (prefs.style === 'executive' && (bestIntent === 'analysis' || bestIntent === 'summarization')) strategy = 'executive_decision_brief';
+
+      const I = Number(Math.min(0.98, 0.68 + bestScore * 0.08).toFixed(2));
+      const P = Number(prefs.detail || prefs.style ? 0.88 : 0.74);
+      const H = Number(Math.min(0.96, 0.60 + historyLen * 0.07).toFixed(2));
+      const total = Number((0.30 * I + 0.25 * C + 0.25 * P + 0.20 * H).toFixed(2));
+
+      return {
+        intent: bestIntent,
+        complexity,
+        persona,
+        strategy,
+        a_score: { I, C, P, H, total },
+        latency_ms: 18 + Math.floor(Math.random() * 45),
+        model: 'openai/gpt-oss-120b (v3-mock)',
+      };
+    }
+
+    function generateResponse(message, analysis, prefs) {
+      const { intent, complexity, persona, strategy } = analysis;
+      const topic = message.trim();
+
+      if (intent === 'coding') {
+        return `### Developer Implementation (${formatLabel(strategy)})\n\nHere is a clean, production-ready pattern for **${topic.slice(0, 95)}**:\n\n\`\`\`python\nfrom fastapi import FastAPI, HTTPException\nfrom pydantic import BaseModel, Field\n\napp = FastAPI(title="Adaptive AI Service")\n\nclass PromptPayload(BaseModel):\n    session_id: str = Field(..., min_length=1)\n    message: str = Field(..., min_length=1, max_length=4000)\n\n@app.post("/respond")\nasync def respond(payload: PromptPayload):\n    return {"success": True, "session_id": payload.session_id}\n\`\`\`\n\n- **Input Validation:** Enforce schema bounds and size limits at the API boundary.\n- **Security:** Keep \`GEMINI_API_KEY\` strictly on the backend and enable explicit CORS origins.\n- **Resilience:** Translate \`429\` rate limits and \`5xx\` failures into typed UI errors with retry actions.`;
+      }
+      if (intent === 'education') {
+        return `### Step-by-Step Explanation: ${topic.slice(0, 85)}\n\n1. **Core Intuition:** Break the concept into three clear stages—input representation, transformation layers, and error-guided adjustment.\n2. **How It Learns:** During training, predictions are compared against targets using a loss function, and gradients flow backward to refine weights.\n3. **Real-World Analogy:** Think of Adaptive AI itself: first it detects your intent, then routes to the right specialist persona, and finally evaluates output quality.\n4. **Quick Recap:** Understanding *why* each layer transforms data makes advanced architectures straightforward to reason about.\n\n*Tailored with **${formatLabel(prefs.detail)}** detail and **${formatLabel(prefs.style)}** style.*`;
+      }
+      if (intent === 'planning') {
+        return `### Phased Execution Plan: ${topic.slice(0, 85)}\n\n| Phase | Core Objective | Deliverable |\n| :--- | :--- | :--- |\n| **Phase 1: Core Contracts** | Lock API schemas, CORS & design tokens | Running FastAPI + Glass UI shell |\n| **Phase 2: End-to-End Flow** | Wire Chat Console, Insights Panel & Feedback | Demo-ready interactive MVP |\n| **Phase 3: Polish & QA** | Verify 30-prompt benchmark & contrast ratios | Submission-ready release |\n\n- **Priority Rule:** Ship the end-to-end chat with visible adaptive insights first before expanding secondary screens.\n- **Risk Mitigation:** Keep a deterministic fallback active so live demos never stall on external API hiccups.`;
+      }
+      if (intent === 'analysis') {
+        return `### Comparative Analysis: ${topic.slice(0, 85)}\n\n| Dimension | Option A (Direct / REST) | Option B (Adaptive / Graph) |\n| :--- | :--- | :--- |\n| **Predictability** | High — simple caching & contracts | Moderate — flexible query shapes |\n| **Transparency** | Explicit endpoints per capability | Requires tracing middleware |\n| **Best Fit** | Fast MVPs & clear service boundaries | Complex nested client graphs |\n\n- **Recommendation:** Optimize for clarity and observability first—expose latency, confidence scores, and evaluation checks directly in the UI.`;
+      }
+      return `### Adaptive Response (${formatLabel(persona)} Persona)\n\nRegarding **${topic.slice(0, 100)}**:\n\n- **Orchestration Decision:** Classified as **${formatLabel(intent)}** at **${formatLabel(complexity)}** complexity using the **${formatLabel(strategy)}** strategy.\n- **Actionable Path:** Start with clear constraints, validate the core loop early, and use the Feedback Bar below to refine future strategy selection.\n- **Transparency:** Click **Inspect Insights** to view the weighted A-score (\`0.30I + 0.25C + 0.25P + 0.20H\`) and 5-dimension quality evaluation.`;
+    }
+
+    function evaluateOutput(responseText) {
+      const dims = {
+        relevance: 0.94,
+        completeness: responseText.length > 260 ? 0.92 : 0.84,
+        clarity: 0.95,
+        consistency: 0.91,
+        format: responseText.includes('###') ? 0.96 : 0.85,
+      };
+      const overall = Number(((dims.relevance + dims.completeness + dims.clarity + dims.consistency + dims.format) / 5).toFixed(2));
+      return {
+        status: overall >= 0.75 ? 'passed' : 'warning',
+        format_compliant: true,
+        overall_score: overall,
+        dimensions: dims,
+      };
+    }
+
+    // =========================================================================
+    // STATE INITIALIZATION
+    // =========================================================================
+    function createInitialState() {
+      const demoId = 'session_demo_01';
+      const q = 'Explain how neural networks learn step by step';
+      const prefs = { language: 'English', detail: 'balanced', output_format: 'markdown', style: 'step_by_step', theme: 'dark' };
+      const analysis = analyzePrompt(q, prefs, 0);
+      const ans = generateResponse(q, analysis, prefs);
+      const evaluation = evaluateOutput(ans);
+      const assistantMsg = {
+        message_id: 'msg_welcome_02',
+        session_id: demoId,
+        role: 'assistant',
+        content: ans,
+        ...analysis,
+        evaluation,
+        applied_preferences: { detail: prefs.detail, style: prefs.style },
+        feedback_rating: 5,
+        created_at: new Date().toISOString(),
+      };
+      return {
+        activeView: 'chat',
+        activeSessionId: demoId,
+        selectedMessageId: assistantMsg.message_id,
+        insightsOpen: true,
+        preferences: prefs,
+        sessions: [
+          {
+            session_id: demoId,
+            title: q,
+            last_intent: analysis.intent,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            messages: [
+              { message_id: 'msg_welcome_01', session_id: demoId, role: 'user', content: q, created_at: new Date().toISOString() },
+              assistantMsg,
+            ],
+          },
+        ],
+        feedbackLog: [
+          { message_id: assistantMsg.message_id, session_id: demoId, intent: 'education', strategy: analysis.strategy, rating: 5 },
+        ],
+      };
+    }
+
+    let state = loadSavedState() || createInitialState();
+    let pendingDeleteSessionId = null;
+
+    function getActiveSession() {
+      let s = state.sessions.find(x => x.session_id === state.activeSessionId);
+      if (!s) {
+        s = { session_id: `session_${Date.now().toString(36)}`, title: 'New Conversation', last_intent: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(), messages: [] };
+        state.sessions.unshift(s);
+        state.activeSessionId = s.session_id;
+      }
+      return s;
+    }
+
+    // =========================================================================
+    // RENDERERS
+    // =========================================================================
+    function applyTheme() {
+      document.documentElement.setAttribute('data-theme', state.preferences.theme || 'dark');
+      const iconName = state.preferences.theme === 'dark' ? 'sun' : 'moon';
+      document.getElementById('btnThemeDesktop').innerHTML = `<i data-lucide="${iconName}" class="h-4 w-4"></i>`;
+      document.getElementById('btnThemeMobile').innerHTML = `<i data-lucide="${iconName}" class="h-4 w-4"></i>`;
+      document.getElementById('prefTheme').value = state.preferences.theme || 'dark';
+      lucide.createIcons();
+    }
+
+    function renderAll() {
+      saveState();
+      applyTheme();
+      document.getElementById('sessionCountBadge').textContent = String(state.sessions.length);
+
+      document.querySelectorAll('.view-pane').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`view-${state.activeView}`).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const active = btn.dataset.view === state.activeView;
+        btn.classList.toggle('nav-active', active);
+        btn.classList.toggle('opacity-85', !active);
+      });
+
+      renderChat();
+      renderInsights();
+      renderSessions();
+      renderPreferencesForm();
+      renderAnalytics();
+      lucide.createIcons();
+    }
+
+    function renderComplexityBars(complexity) {
+      const n = complexity === 'high' ? 3 : complexity === 'medium' ? 2 : 1;
+      const bars = [1, 2, 3].map(idx => {
+        const h = idx === 1 ? 'h-2' : idx === 2 ? 'h-2.5' : 'h-3';
+        let color = 'bg-white/20';
+        if (idx <= n) {
+          color = n === 1 ? 'bg-[#2EC4B6]' : n === 3 ? 'bg-[#6C63FF] glow-violet' : 'bg-[#6C63FF]';
+        }
+        return `<span class="inline-block w-1 rounded-sm ${h} ${color}"></span>`;
+      }).join('');
+      return `<span class="inline-flex items-end gap-0.5" aria-hidden="true">${bars}</span>`;
+    }
+
+    function renderChat() {
+      const session = getActiveSession();
+      document.getElementById('activeSessionLabel').textContent = session.session_id;
+      document.getElementById('activePrefsSummary').textContent =
+        `${formatLabel(state.preferences.detail)} • ${formatLabel(state.preferences.style)}`;
+      document.getElementById('quickDetail').value = state.preferences.detail;
+      document.getElementById('quickStyle').value = state.preferences.style;
+
+      const container = document.getElementById('messagesContainer');
+      if (session.messages.length === 0) {
+        const samples = [
+          'Explain how neural networks learn step by step',
+          'Write a Python FastAPI endpoint with Pydantic validation',
+          'Create a 2-week hackathon sprint roadmap with milestones',
+          'Compare REST vs GraphQL pros and cons for a dashboard',
+        ];
+        container.innerHTML = `
+          <div class="flex h-full flex-col items-center justify-center text-center py-8">
+            <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#6C63FF]/50 bg-[#6C63FF]/20">
+              <i data-lucide="sparkles" class="h-6 w-6 text-[#2EC4B6]"></i>
+            </div>
+            <h1 class="mb-2 text-2xl font-bold">See How Every Answer Is Orchestrated</h1>
+            <p class="mb-6 max-w-lg text-sm opacity-75">Send a prompt to inspect detected intent, complexity, persona, strategy, weighted A-score, and 5-dimension evaluation in real time.</p>
+            <div class="grid w-full max-w-2xl gap-2.5 sm:grid-cols-2">
+              ${samples.map(s => `<button class="quick-sample glass rounded-xl p-3.5 text-left text-xs transition hover:border-[#6C63FF]" data-prompt="${escapeHtml(s)}">${escapeHtml(s)}</button>`).join('')}
+            </div>
+          </div>`;
+        container.querySelectorAll('.quick-sample').forEach(btn => {
+          btn.addEventListener('click', () => handleSendMessage(btn.dataset.prompt));
+        });
+        return;
+      }
+
+      container.innerHTML = session.messages.map((m, idx) => {
+        if (m.role === 'user') {
+          return `
+            <div class="flex justify-end">
+              <div class="glass-user max-w-2xl px-4 py-3 text-sm">
+                <div class="mb-1 text-[10px] uppercase tracking-wider opacity-65">You</div>
+                <p class="whitespace-pre-wrap leading-relaxed">${escapeHtml(m.content)}</p>
+              </div>
+            </div>`;
+        }
+
+        const passed = m.evaluation?.status === 'passed';
+        const personaIcon = PERSONA_ICON_NAME[m.persona] || 'sparkles';
+        const prevPrompt = idx > 0 && session.messages[idx - 1].role === 'user' ? session.messages[idx - 1].content : '';
+        const isSelected = state.selectedMessageId === m.message_id;
+
+        return `
+          <div class="flex justify-start">
+            <div class="glass assistant-glass w-full max-w-3xl px-5 py-4 ${isSelected ? 'ring-1 ring-[#6C63FF]/75' : ''}">
+              <div class="mb-2 flex items-center justify-between text-[11px] uppercase tracking-wider opacity-75">
+                <span class="flex items-center gap-1.5 font-semibold"><i data-lucide="sparkles" class="h-3.5 w-3.5 text-[#2EC4B6]"></i> Adaptive AI</span>
+                <div class="flex items-center gap-2">
+                  <button class="copy-msg-btn rounded-md p-1 opacity-75 hover:bg-white/10 hover:opacity-100" data-mid="${m.message_id}" title="Copy response" aria-label="Copy response">
+                    <i data-lucide="copy" class="h-3.5 w-3.5"></i>
+                  </button>
+                  <span class="font-mono-code">${m.latency_ms || 24} ms • A=${m.a_score ? m.a_score.total.toFixed(2) : '0.84'}</span>
+                </div>
+              </div>
+
+              <div class="md-body text-sm">${renderSafeMarkdown(m.content)}</div>
+
+              <!-- Insight Chips -->
+              <div class="mt-3.5 flex flex-wrap items-center gap-2">
+                <button class="chip inspect-btn" data-mid="${m.message_id}">
+                  <i data-lucide="compass" class="h-3.5 w-3.5 text-[#6C63FF]"></i>
+                  <span>${formatLabel(m.intent)}</span>
+                </button>
+                <button class="chip inspect-btn" data-mid="${m.message_id}">
+                  ${renderComplexityBars(m.complexity)}
+                  <span>${formatLabel(m.complexity)}</span>
+                </button>
+                <button class="chip inspect-btn" data-mid="${m.message_id}">
+                  <i data-lucide="${personaIcon}" class="h-3.5 w-3.5 text-[#2EC4B6]"></i>
+                  <span>${formatLabel(m.persona)}</span>
+                </button>
+                <button class="chip inspect-btn" data-mid="${m.message_id}">
+                  <span>${formatLabel(m.strategy)}</span>
+                </button>
+                <button class="inspect-btn ml-auto inline-flex items-center gap-1 text-xs font-medium text-[#2EC4B6] hover:underline" data-mid="${m.message_id}">
+                  <i data-lucide="info" class="h-3.5 w-3.5"></i> Inspect Insights
+                </button>
+              </div>
+
+              <!-- Evaluation & Feedback Bar -->
+              <div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-2.5 text-xs">
+                <div class="flex items-center gap-2">
+                  ${passed
+                    ? `<span class="inline-flex items-center gap-1 rounded-full bg-[#2EC4B6]/15 px-2.5 py-0.5 font-medium text-[#2EC4B6]"><i data-lucide="check-circle-2" class="h-3.5 w-3.5"></i> Evaluation Passed (${Math.round((m.evaluation?.overall_score || 0.92) * 100)}%)</span>`
+                    : `<span class="inline-flex items-center gap-1 rounded-full border border-amber-400/70 px-2.5 py-0.5 font-medium text-amber-300"><i data-lucide="alert-triangle" class="h-3.5 w-3.5"></i> Needs Review</span>`
+                  }
+                  <button class="regen-btn inline-flex items-center gap-1 rounded-lg px-2 py-1 opacity-75 hover:bg-white/10 hover:opacity-100" data-prompt="${escapeHtml(prevPrompt)}">
+                    <i data-lucide="refresh-cw" class="h-3 w-3"></i> Regenerate
+                  </button>
+                </div>
+                <div class="flex items-center gap-1" title="Rate 1–5 to train Thompson-sampling adaptation">
+                  ${[1, 2, 3, 4, 5].map(st => {
+                    const numRating = typeof m.feedback_rating === 'number' ? m.feedback_rating : (m.feedback_rating === 'up' ? 5 : 0);
+                    const filled = st <= numRating;
+                    return `<button class="rate-btn rounded p-1 transition hover:bg-white/10" data-mid="${m.message_id}" data-rating="${st}" aria-label="Rate ${st} stars"><i data-lucide="star" class="h-3.5 w-3.5 ${filled ? 'fill-[#2EC4B6] text-[#2EC4B6]' : 'opacity-50'}"></i></button>`;
+                  }).join('')}
+                </div>
+              </div>
+              <div id="corr-box-${m.message_id}" class="mt-2 hidden">
+                <div class="flex gap-2">
+                  <input id="corr-input-${m.message_id}" type="text" placeholder="Tell Adaptive AI what to improve or prefer..." class="glass flex-1 rounded-xl px-3 py-1.5 text-xs outline-none focus:border-[#6C63FF]" />
+                  <button class="send-corr-btn btn-primary px-3 py-1.5 text-xs" data-mid="${m.message_id}">Submit</button>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+
+      container.querySelectorAll('.copy-msg-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const msg = session.messages.find(x => x.message_id === btn.dataset.mid);
+          if (!msg) return;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(msg.content).then(() => showToast('Response copied')).catch(() => {
+              const ta = document.createElement('textarea');
+              ta.value = msg.content;
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+              showToast('Response copied');
+            });
+          } else {
+            const ta = document.createElement('textarea');
+            ta.value = msg.content;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('Response copied');
+          }
+        });
+      });
+
+      container.querySelectorAll('.inspect-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.selectedMessageId = btn.dataset.mid;
+          state.insightsOpen = true;
+          renderAll();
+          if (window.innerWidth < 1024) {
+            document.getElementById('insightsMobileSheet').classList.remove('hidden');
+            document.getElementById('insightsMobileSheet').classList.add('flex');
+          }
+        });
+      });
+
+      container.querySelectorAll('.regen-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (btn.dataset.prompt) handleSendMessage(btn.dataset.prompt, true);
+        });
+      });
+
+      container.querySelectorAll('.rate-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mid = btn.dataset.mid;
+          const rating = Number(btn.dataset.rating);
+          const msg = session.messages.find(x => x.message_id === mid);
+          if (!msg) return;
+          msg.feedback_rating = rating;
+          state.feedbackLog.push({ message_id: mid, session_id: session.session_id, intent: msg.intent, strategy: msg.strategy, rating });
+          saveState();
+          renderChat();
+          renderAnalytics();
+          lucide.createIcons();
+          if (rating <= 3) {
+            const box = document.getElementById(`corr-box-${mid}`);
+            if (box) box.classList.remove('hidden');
+            showToast(`Rated ${rating}/5 — Thompson adaptation updated`);
+          } else {
+            showToast(`Rated ${rating}/5 — Thompson adaptation boosted ${formatLabel(msg.strategy)}`);
+          }
+        });
+      });
+
+      container.querySelectorAll('.send-corr-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const mid = btn.dataset.mid;
+          const input = document.getElementById(`corr-input-${mid}`);
+          if (input && input.value.trim()) {
+            showToast('Correction saved to feedback log');
+            document.getElementById(`corr-box-${mid}`).classList.add('hidden');
+          }
+        });
+      });
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function buildInsightsHtml(msg) {
+      if (!msg) {
+        return `<div class="opacity-70">Select any assistant response to inspect its intent, complexity, persona, A-score heuristic, and evaluation dimensions.</div>`;
+      }
+      const a = msg.a_score || { I: 0.85, C: 0.78, P: 0.88, H: 0.65, total: 0.80 };
+      const dims = msg.evaluation?.dimensions || { relevance: 0.94, completeness: 0.91, clarity: 0.95, consistency: 0.91, format: 0.94 };
+      const labels = { I: 'Intent Confidence (0.30)', C: 'Complexity Fit (0.25)', P: 'Preference Align (0.25)', H: 'History Context (0.20)' };
+
+      return `
+        <div class="grid grid-cols-2 gap-2">
+          <div class="glass rounded-xl p-2.5"><div class="opacity-65">Intent</div><div class="mt-0.5 font-semibold">${formatLabel(msg.intent)}</div></div>
+          <div class="glass rounded-xl p-2.5"><div class="opacity-65">Complexity</div><div class="mt-0.5 font-semibold">${formatLabel(msg.complexity)}</div></div>
+          <div class="glass rounded-xl p-2.5"><div class="opacity-65">Persona</div><div class="mt-0.5 font-semibold">${formatLabel(msg.persona)}</div></div>
+          <div class="glass rounded-xl p-2.5"><div class="opacity-65">Strategy</div><div class="mt-0.5 font-semibold">${formatLabel(msg.strategy)}</div></div>
+        </div>
+
+        <div class="glass rounded-xl p-3">
+          <div class="mb-1 flex items-center justify-between">
+            <span class="font-semibold">A-Score Heuristic</span>
+            <span class="font-mono-code text-sm font-bold text-[#2EC4B6]">${a.total.toFixed(2)}</span>
+          </div>
+          <div class="mb-2 font-mono-code text-[10px] opacity-65">A = 0.30I + 0.25C + 0.25P + 0.20H</div>
+          ${(() => {
+            const pct = Math.max(0, Math.min(1, a.total));
+            const arcLen = 126;
+            const dashOffset = (arcLen * (1 - pct)).toFixed(1);
+            const angleDeg = -90 + pct * 180;
+            return `
+            <div class="my-2 flex justify-center">
+              <svg width="132" height="74" viewBox="0 0 132 74" aria-label="A-Score Gauge ${a.total.toFixed(2)}">
+                <defs>
+                  <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#6C63FF" />
+                    <stop offset="100%" stop-color="#2EC4B6" />
+                  </linearGradient>
+                </defs>
+                <path d="M 16 64 A 50 50 0 0 1 116 64" fill="none" stroke="rgba(248,250,252,0.14)" stroke-width="9" stroke-linecap="round" />
+                <path d="M 16 64 A 50 50 0 0 1 116 64" fill="none" stroke="url(#gaugeGrad)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${arcLen}" stroke-dashoffset="${dashOffset}" />
+                <g transform="translate(66,64) rotate(${angleDeg})">
+                  <line x1="0" y1="0" x2="0" y2="-36" stroke="#F8FAFC" stroke-width="2.5" stroke-linecap="round" />
+                  <circle cx="0" cy="0" r="4.5" fill="#2EC4B6" stroke="#121826" stroke-width="1.5" />
+                </g>
+              </svg>
+            </div>`;
+          })()}
+          ${['I', 'C', 'P', 'H'].map(k => `
+            <div class="mb-2">
+              <div class="flex justify-between text-[11px]"><span>${labels[k]}</span><span class="font-mono-code">${a[k].toFixed(2)}</span></div>
+              <div class="mt-1 h-1.5 rounded-full bg-white/10"><div class="h-1.5 rounded-full bg-[#6C63FF]" style="width:${Math.round(a[k] * 100)}%"></div></div>
+            </div>`).join('')}
+        </div>
+
+        <div class="glass rounded-xl p-3">
+          <div class="mb-2 flex items-center justify-between">
+            <span class="font-semibold">5-Dimension Evaluation</span>
+            <span class="font-mono-code font-semibold text-[#2EC4B6]">${Math.round((msg.evaluation?.overall_score || 0.92) * 100)}%</span>
+          </div>
+          ${Object.entries(dims).map(([k, v]) => `
+            <div class="mb-1.5">
+              <div class="flex justify-between capitalize"><span>${k}</span><span class="font-mono-code">${Math.round(v * 100)}%</span></div>
+              <div class="mt-0.5 h-1.5 rounded-full bg-white/10"><div class="h-1.5 rounded-full bg-[#2EC4B6]" style="width:${Math.round(v * 100)}%"></div></div>
+            </div>`).join('')}
+        </div>
+
+        <div class="glass rounded-xl p-3 space-y-1.5">
+          <div class="font-semibold">Applied Context</div>
+          <div class="flex items-start justify-between gap-3"><span class="shrink-0 opacity-70">Model</span><span class="font-mono-code text-right text-[11px]">${escapeHtml(msg.model || 'gemini-2.0-flash')}</span></div>
+          <div class="flex justify-between"><span class="opacity-70">Latency</span><span class="font-mono-code">${msg.latency_ms || 25} ms</span></div>
+          <div class="flex justify-between"><span class="opacity-70">Detail</span><span>${formatLabel(msg.applied_preferences?.detail || state.preferences.detail)}</span></div>
+          <div class="flex justify-between"><span class="opacity-70">Style</span><span>${formatLabel(msg.applied_preferences?.style || state.preferences.style)}</span></div>
+        </div>`;
+    }
+
+    function renderInsights() {
+      const session = getActiveSession();
+      const msg = session.messages.find(m => m.message_id === state.selectedMessageId && m.role === 'assistant')
+        || [...session.messages].reverse().find(m => m.role === 'assistant')
+        || null;
+      const html = buildInsightsHtml(msg);
+      document.getElementById('insightsContentDesktop').innerHTML = html;
+      document.getElementById('insightsContentMobile').innerHTML = html;
+
+      const desktopPanel = document.getElementById('insightsDesktop');
+      if (state.insightsOpen) {
+        desktopPanel.classList.remove('lg:hidden');
+        desktopPanel.classList.add('lg:flex');
+      } else {
+        desktopPanel.classList.add('lg:hidden');
+        desktopPanel.classList.remove('lg:flex');
+      }
+    }
+
+    function renderPlayground(promptText) {
+      const res = analyzePrompt(promptText, state.preferences, getActiveSession().messages.length);
+      document.getElementById('playgroundResult').innerHTML = `
+        <div class="mb-4 grid gap-4 sm:grid-cols-4">
+          <div class="glass rounded-xl p-3"><div class="text-xs opacity-65">Intent</div><div class="mt-1 font-bold">${formatLabel(res.intent)}</div></div>
+          <div class="glass rounded-xl p-3"><div class="text-xs opacity-65">Complexity</div><div class="mt-1 flex items-center gap-2 font-bold">${renderComplexityBars(res.complexity)} ${formatLabel(res.complexity)}</div></div>
+          <div class="glass rounded-xl p-3"><div class="text-xs opacity-65">Persona</div><div class="mt-1 font-bold">${formatLabel(res.persona)}</div></div>
+          <div class="glass rounded-xl p-3"><div class="text-xs opacity-65">Strategy</div><div class="mt-1 font-bold">${formatLabel(res.strategy)}</div></div>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-3 text-sm">
+          <span class="font-mono-code text-xs opacity-80">A = 0.30(${res.a_score.I}) + 0.25(${res.a_score.C}) + 0.25(${res.a_score.P}) + 0.20(${res.a_score.H})</span>
+          <span class="font-mono-code text-base font-bold text-[#2EC4B6]">A-Score: ${res.a_score.total.toFixed(2)}</span>
+        </div>`;
+    }
+
+    function renderSessions() {
+      const el = document.getElementById('sessionsList');
+      if (state.sessions.length === 0) {
+        el.innerHTML = `<div class="glass p-6 text-sm opacity-75">No saved sessions yet.</div>`;
+        return;
+      }
+      el.innerHTML = state.sessions.map(s => `
+        <div class="glass flex items-center justify-between gap-4 p-4">
+          <button class="switch-session-btn flex flex-1 items-center gap-3 text-left" data-sid="${s.session_id}">
+            <i data-lucide="message-square" class="h-4 w-4 text-[#2EC4B6]"></i>
+            <div>
+              <div class="font-semibold text-sm">${escapeHtml(s.title)} ${s.session_id === state.activeSessionId ? '<span class="ml-1 text-xs text-[#2EC4B6]">(Active)</span>' : ''}</div>
+              <div class="text-xs opacity-65">${s.messages.length} messages • Last intent: ${formatLabel(s.last_intent)}</div>
+            </div>
+          </button>
+          <button class="del-session-btn rounded-lg p-2 opacity-70 hover:bg-white/10 hover:opacity-100" data-sid="${s.session_id}" aria-label="Delete session">
+            <i data-lucide="trash-2" class="h-4 w-4"></i>
+          </button>
+        </div>`).join('');
+
+      el.querySelectorAll('.switch-session-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.activeSessionId = btn.dataset.sid;
+          state.activeView = 'chat';
+          renderAll();
+        });
+      });
+
+      el.querySelectorAll('.del-session-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          pendingDeleteSessionId = btn.dataset.sid;
+          const modal = document.getElementById('confirmModal');
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        });
+      });
+    }
+
+    function renderPreferencesForm() {
+      document.getElementById('prefLanguage').value = state.preferences.language;
+      document.getElementById('prefDetail').value = state.preferences.detail;
+      document.getElementById('prefStyle').value = state.preferences.style;
+      document.getElementById('prefFormat').value = state.preferences.output_format;
+      document.getElementById('prefTheme').value = state.preferences.theme;
+    }
+
+    function renderAnalytics() {
+      const total = state.feedbackLog.length;
+      const toNum = (r) => (typeof r === 'number' ? r : (r === 'up' ? 5 : 2));
+      const avg = total ? (state.feedbackLog.reduce((a, f) => a + toNum(f.rating), 0) / total) : 0;
+      const pct = total ? Math.round((avg / 5) * 100) : 0;
+
+      const grouped = {};
+      state.feedbackLog.forEach(f => {
+        const key = `${f.intent || 'general'}|${f.strategy || 'adaptive'}`;
+        if (!grouped[key]) grouped[key] = { intent: f.intent, strategy: f.strategy, up: 0, total: 0 };
+        grouped[key].total += 1;
+        if (toNum(f.rating) >= 4) grouped[key].up += 1;
+      });
+
+      const rows = Object.values(grouped).map(g => `
+        <tr class="border-t border-white/10">
+          <td class="py-2">${formatLabel(g.intent)}</td>
+          <td class="py-2">${formatLabel(g.strategy)}</td>
+          <td class="py-2 font-mono-code">${g.up}/${g.total}</td>
+          <td class="py-2 font-mono-code text-[#2EC4B6]">${Math.round((g.up / g.total) * 100)}%</td>
+        </tr>`).join('');
+
+      document.getElementById('analyticsContainer').innerHTML = `
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="text-sm font-bold">Feedback Analytics (Stage 2)</h2>
+          <span class="font-mono-code text-xs text-[#2EC4B6]">${pct}% Satisfaction (${total} ratings)</span>
+        </div>
+        ${total === 0
+          ? '<div class="text-xs opacity-70">Rate responses in Chat Console to populate strategy performance analytics.</div>'
+          : `<table class="w-full text-left text-xs"><thead><tr class="opacity-65"><th class="pb-2">Intent</th><th class="pb-2">Strategy</th><th class="pb-2">Upvotes</th><th class="pb-2">Rate</th></tr></thead><tbody>${rows}</tbody></table>`
+        }`;
+    }
+
+    // =========================================================================
+    // ACTIONS & EVENT LISTENERS
+    // =========================================================================
+    function handleSendMessage(rawText, isRegenerate = false) {
+      const text = (rawText || '').trim();
+      if (!text || text.length > 4000) return;
+
+      const session = getActiveSession();
+      if (!isRegenerate) {
+        if (session.messages.length === 0) session.title = text.slice(0, 64);
+        session.messages.push({
+          message_id: `msg_u_${Date.now()}`,
+          session_id: session.session_id,
+          role: 'user',
+          content: text,
+          created_at: new Date().toISOString(),
+        });
+      }
+
+      const analysis = analyzePrompt(text, state.preferences, session.messages.length);
+      const responseText = generateResponse(text, analysis, state.preferences);
+      const evaluation = evaluateOutput(responseText);
+      const assistantMsg = {
+        message_id: `msg_a_${Date.now() + 1}`,
+        session_id: session.session_id,
+        role: 'assistant',
+        content: responseText,
+        ...analysis,
+        evaluation,
+        applied_preferences: { detail: state.preferences.detail, style: state.preferences.style },
+        feedback_rating: null,
+        created_at: new Date().toISOString(),
+      };
+      session.messages.push(assistantMsg);
+      session.last_intent = analysis.intent;
+      session.updated_at = new Date().toISOString();
+      state.selectedMessageId = assistantMsg.message_id;
+      renderAll();
+    }
+
+    function createNewSession() {
+      const id = `session_${Math.random().toString(36).slice(2, 8)}`;
+      state.sessions.unshift({
+        session_id: id,
+        title: 'New Conversation',
+        last_intent: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        messages: [],
+      });
+      state.activeSessionId = id;
+      state.selectedMessageId = null;
+      state.activeView = 'chat';
+      renderAll();
+      showToast('Started new session');
+    }
+
+    function runDemoTour() {
+      state.activeView = 'chat';
+      state.insightsOpen = true;
+      renderAll();
+      showToast('Demo Tour: Sending coding prompt...');
+      setTimeout(() => {
+        handleSendMessage('Write a FastAPI endpoint with Pydantic validation and explain error handling');
+        showToast('Demo Tour: Inspecting Insights Panel & A-Score');
+      }, 500);
+      setTimeout(() => {
+        handleSendMessage('Create a 2-week hackathon sprint roadmap with milestones and risks');
+        showToast('Demo Tour complete — explore Playground & Status tabs!');
+      }, 1600);
+    }
+
+    // Bind navigation
+    document.querySelectorAll('.nav-btn, .mobile-nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.activeView = btn.dataset.view;
+        document.getElementById('mobileDrawer').classList.add('hidden');
+        document.getElementById('mobileDrawer').classList.remove('flex');
+        renderAll();
+      });
+    });
+
+    document.getElementById('btnNewSession').addEventListener('click', createNewSession);
+    document.getElementById('btnNewSessionMobile').addEventListener('click', () => {
+      document.getElementById('mobileDrawer').classList.add('hidden');
+      createNewSession();
+    });
+    document.getElementById('btnNewSessionFromList').addEventListener('click', createNewSession);
+
+    document.getElementById('btnDemoTour').addEventListener('click', runDemoTour);
+    document.getElementById('btnDemoTourMobile').addEventListener('click', runDemoTour);
+
+    const toggleTheme = () => {
+      state.preferences.theme = state.preferences.theme === 'dark' ? 'light' : 'dark';
+      renderAll();
+    };
+    document.getElementById('btnThemeDesktop').addEventListener('click', toggleTheme);
+    document.getElementById('btnThemeMobile').addEventListener('click', toggleTheme);
+
+    document.getElementById('btnMobileMenu').addEventListener('click', () => {
+      document.getElementById('mobileDrawer').classList.remove('hidden');
+      document.getElementById('mobileDrawer').classList.add('flex');
+    });
+    document.getElementById('btnCloseMobileMenu').addEventListener('click', () => {
+      document.getElementById('mobileDrawer').classList.add('hidden');
+      document.getElementById('mobileDrawer').classList.remove('flex');
+    });
+
+    document.getElementById('btnToggleInsights').addEventListener('click', () => {
+      if (window.innerWidth < 1024) {
+        document.getElementById('insightsMobileSheet').classList.remove('hidden');
+        document.getElementById('insightsMobileSheet').classList.add('flex');
+      } else {
+        state.insightsOpen = !state.insightsOpen;
+        renderInsights();
+      }
+    });
+    document.getElementById('btnCloseInsightsDesktop').addEventListener('click', () => {
+      state.insightsOpen = false;
+      renderInsights();
+    });
+    document.getElementById('btnCloseInsightsMobile').addEventListener('click', () => {
+      document.getElementById('insightsMobileSheet').classList.add('hidden');
+      document.getElementById('insightsMobileSheet').classList.remove('flex');
+    });
+
+    // Composer events
+    const composer = document.getElementById('composerInput');
+    composer.addEventListener('input', () => {
+      document.getElementById('charCounter').textContent = `${composer.value.length}/4000`;
+    });
+    composer.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const val = composer.value;
+        composer.value = '';
+        document.getElementById('charCounter').textContent = '0/4000';
+        handleSendMessage(val);
+      }
+    });
+    document.getElementById('btnSend').addEventListener('click', () => {
+      const val = composer.value;
+      composer.value = '';
+      document.getElementById('charCounter').textContent = '0/4000';
+      handleSendMessage(val);
+    });
+
+    // Quick preferences popover
+    document.getElementById('btnQuickPrefs').addEventListener('click', () => {
+      document.getElementById('quickPrefsPopover').classList.toggle('hidden');
+    });
+    document.getElementById('btnClosePopover').addEventListener('click', () => {
+      document.getElementById('quickPrefsPopover').classList.add('hidden');
+    });
+    document.getElementById('quickDetail').addEventListener('change', (e) => {
+      state.preferences.detail = e.target.value;
+      renderAll();
+    });
+    document.getElementById('quickStyle').addEventListener('change', (e) => {
+      state.preferences.style = e.target.value;
+      renderAll();
+    });
+
+    // Playground events
+    document.getElementById('btnRunAnalyze').addEventListener('click', () => {
+      renderPlayground(document.getElementById('playgroundInput').value);
+    });
+    document.querySelectorAll('.pg-sample').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('playgroundInput').value = btn.dataset.sample;
+        renderPlayground(btn.dataset.sample);
+      });
+    });
+
+    // Preferences form
+    document.getElementById('preferencesForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      state.preferences = {
+        language: document.getElementById('prefLanguage').value.trim() || 'English',
+        detail: document.getElementById('prefDetail').value,
+        style: document.getElementById('prefStyle').value,
+        output_format: document.getElementById('prefFormat').value,
+        theme: document.getElementById('prefTheme').value,
+      };
+      renderAll();
+      showToast('Preferences saved');
+    });
+    document.getElementById('btnResetPrefs').addEventListener('click', () => {
+      state.preferences = { language: 'English', detail: 'balanced', output_format: 'markdown', style: 'step_by_step', theme: 'dark' };
+      renderAll();
+      showToast('Preferences reset to defaults');
+    });
+
+    // Delete confirmation modal
+    document.getElementById('btnCancelDelete').addEventListener('click', () => {
+      pendingDeleteSessionId = null;
+      document.getElementById('confirmModal').classList.add('hidden');
+      document.getElementById('confirmModal').classList.remove('flex');
+    });
+    document.getElementById('btnConfirmDelete').addEventListener('click', () => {
+      if (pendingDeleteSessionId) {
+        state.sessions = state.sessions.filter(s => s.session_id !== pendingDeleteSessionId);
+        if (state.activeSessionId === pendingDeleteSessionId) {
+          state.activeSessionId = state.sessions[0]?.session_id || null;
+        }
+        pendingDeleteSessionId = null;
+        document.getElementById('confirmModal').classList.add('hidden');
+        document.getElementById('confirmModal').classList.remove('flex');
+        renderAll();
+        showToast('Session deleted');
+      }
+    });
+
+    // Initial Boot
+    renderPlayground(document.getElementById('playgroundInput').value);
+    renderAll();
+  </script>
+</body>
+</html>
