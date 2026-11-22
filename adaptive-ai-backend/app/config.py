@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 from typing import Literal
 
@@ -43,7 +44,14 @@ class Settings(BaseSettings):
     # --- adaptation / storage -------------------------------------------
     adaptation_mode: Literal["thompson", "greedy", "off"] = "thompson"
     min_feedback_samples: int = Field(default=3, ge=1, le=100)
-    database_url: str = "sqlite:///./data/adaptive.db"
+    # On Vercel the deployment filesystem is read-only; only /tmp is writable,
+    # so the default SQLite file must live there or the app crashes at import.
+    # An explicit DATABASE_URL env var always overrides this default.
+    database_url: str = Field(
+        default_factory=lambda: (
+            "sqlite:////tmp/adaptive.db" if os.getenv("VERCEL") else "sqlite:///./data/adaptive.db"
+        )
+    )
     session_ttl_days: int = Field(default=0, ge=0, le=3650)  # 0 = keep forever
 
     model_config = SettingsConfigDict(

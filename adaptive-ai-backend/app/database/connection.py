@@ -17,7 +17,13 @@ _connect_args = {"check_same_thread": False} if _is_sqlite else {}
 if settings.database_url.startswith("sqlite:///"):
     database_path = settings.database_url.removeprefix("sqlite:///")
     if database_path and database_path != ":memory:":
-        Path(database_path).parent.mkdir(parents=True, exist_ok=True)
+        try:
+            Path(database_path).parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            # Read-only filesystem (e.g. serverless): if the directory cannot
+            # be created here, engine creation below will surface the real
+            # error at connect time instead of crashing the import.
+            pass
 
 engine = create_engine(settings.database_url, connect_args=_connect_args, pool_pre_ping=True)
 
