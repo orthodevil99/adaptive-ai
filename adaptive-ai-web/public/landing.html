@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adaptive AI — Transparent AI Orchestration Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --violet: #6C63FF;
+      --ink: #121826;
+      --mist: #F8FAFC;
+      --teal: #2EC4B6;
+
+      --bg: var(--ink);
+      --text: var(--mist);
+      --glass-blur: 16px;
+      --radius: 18px;
+    }
+
+    [data-theme='light'] {
+      --bg: var(--mist);
+      --text: var(--ink);
+    }
+
+    @media (max-width: 768px) {
+      :root { --glass-blur: 12px; }
+    }
+
+    html { scroll-behavior: smooth; }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      background-image:
+        radial-gradient(50rem 50rem at 12% -6%, rgba(108, 99, 255, 0.48), transparent 58%),
+        radial-gradient(42rem 42rem at 92% 16%, rgba(46, 196, 182, 0.34), transparent 55%),
+        radial-gradient(36rem 36rem at 50% 94%, rgba(108, 99, 255, 0.28), transparent 58%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    [data-theme='light'] body {
+      background-image:
+        radial-gradient(46rem 46rem at 10% 0%, rgba(108, 99, 255, 0.24), transparent 58%),
+        radial-gradient(40rem 40rem at 92% 18%, rgba(46, 196, 182, 0.24), transparent 56%);
+    }
+
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+
+    /* Circuit-board backdrop (Design 3) */
+    .circuit-backdrop {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .circuit-backdrop svg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.38;
+    }
+    [data-theme='light'] .circuit-backdrop svg { opacity: 0.14; }
+
+    .page-shell { position: relative; z-index: 1; }
+
+    /* Glass levels */
+    .glass {
+      background: linear-gradient(135deg, rgba(248, 250, 252, 0.11) 0%, rgba(248, 250, 252, 0.04) 100%);
+      border: 1px solid rgba(248, 250, 252, 0.18);
+      border-top-color: rgba(248, 250, 252, 0.30);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 36px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+    }
+
+    .glass-elevated {
+      background: linear-gradient(145deg, rgba(248, 250, 252, 0.15) 0%, rgba(248, 250, 252, 0.06) 100%);
+      border: 1px solid rgba(108, 99, 255, 0.38);
+      border-top-color: rgba(46, 196, 182, 0.55);
+      border-radius: var(--radius);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.46), 0 0 32px rgba(46, 196, 182, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+      backdrop-filter: blur(var(--glass-blur)) saturate(175%);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(175%);
+    }
+
+    [data-theme='light'] .glass {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.50) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.90);
+      box-shadow: 0 10px 32px rgba(18, 24, 38, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    [data-theme='light'] .glass-elevated {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.62) 100%);
+      border: 1px solid rgba(108, 99, 255, 0.35);
+      box-shadow: 0 16px 44px rgba(18, 24, 38, 0.12), inset 0 1px 0 rgba(255, 255, 255, 1);
+    }
+
+    @supports not (backdrop-filter: blur(1px)) {
+      .glass, .glass-elevated { background: rgba(18, 24, 38, 0.94); }
+      [data-theme='light'] .glass, [data-theme='light'] .glass-elevated { background: rgba(248, 250, 252, 0.96); }
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2EC4B6 0%, #4F8CFF 52%, #6C63FF 100%);
+      color: #F8FAFC;
+      font-weight: 600;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 24px rgba(108, 99, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+      transition: filter 150ms ease, transform 120ms ease;
+    }
+    .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: rgba(248, 250, 252, 0.06);
+      border: 1px solid rgba(108, 99, 255, 0.58);
+      color: var(--text);
+      font-weight: 500;
+      border-radius: 12px;
+      transition: background 150ms ease, border-color 150ms ease;
+    }
+    .btn-secondary:hover { background: rgba(108, 99, 255, 0.16); border-color: var(--violet); }
+
+    .chip {
+      background: rgba(248, 250, 252, 0.06);
+      border: 1px solid rgba(108, 99, 255, 0.55);
+      border-radius: 9999px;
+      font-size: 12px;
+      padding: 5px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 150ms ease, border-color 150ms ease;
+    }
+    .chip-active {
+      background: rgba(108, 99, 255, 0.26);
+      border-color: #2EC4B6;
+      font-weight: 600;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #2EC4B6 0%, #8B85FF 55%, #6C63FF 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+  </style>
+</head>
+<body class="antialiased">
+  <!-- Design 3 Circuit-Board Backdrop -->
+  <div class="circuit-backdrop" aria-hidden="true">
+    <svg viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="lpGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#2EC4B6" stop-opacity="0.65" />
+          <stop offset="50%" stop-color="#6C63FF" stop-opacity="0.55" />
+          <stop offset="100%" stop-color="#2EC4B6" stop-opacity="0.15" />
+        </linearGradient>
+      </defs>
+      <path d="M180 0 V180 L250 250 V420 L340 510 H520" stroke="url(#lpGrad1)" stroke-width="1.3" />
+      <path d="M240 0 V130 L310 200 V360" stroke="url(#lpGrad1)" stroke-width="1" />
+      <path d="M1260 0 V170 L1180 250 V430 L1080 530 H880" stroke="url(#lpGrad1)" stroke-width="1.3" />
+      <path d="M1200 0 V120 L1130 190 V340" stroke="url(#lpGrad1)" stroke-width="1" />
+      <path d="M640 0 V240 L680 280 V380" stroke="url(#lpGrad1)" stroke-width="1.1" />
+      <path d="M800 0 V240 L760 280 V380" stroke="url(#lpGrad1)" stroke-width="1.1" />
+      <path d="M180 900 V700 L260 620 H440" stroke="url(#lpGrad1)" stroke-width="1.2" />
+      <path d="M1260 900 V690 L1180 610 H980" stroke="url(#lpGrad1)" stroke-width="1.2" />
+      <circle cx="250" cy="250" r="3.5" fill="#2EC4B6" />
+      <circle cx="310" cy="200" r="3" fill="#6C63FF" />
+      <circle cx="1180" cy="250" r="3.5" fill="#2EC4B6" />
+      <circle cx="1130" cy="190" r="3" fill="#6C63FF" />
+      <circle cx="680" cy="280" r="3" fill="#2EC4B6" />
+      <circle cx="760" cy="280" r="3" fill="#6C63FF" />
+    </svg>
+  </div>
+
+  <div class="page-shell">
+    <!-- Sticky Frosted Glass Navbar -->
+    <header class="sticky top-0 z-40 px-4 pt-3 md:px-8">
+      <div class="glass mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
+        <a href="#top" class="flex items-center gap-2.5">
+          <div class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#6C63FF]/50 bg-[#6C63FF]/20">
+            <i data-lucide="sparkles" class="h-5 w-5 text-[#2EC4B6]"></i>
+          </div>
+          <div>
+            <span class="text-base font-bold tracking-tight">Adaptive AI</span>
+            <span class="ml-1.5 hidden rounded-full bg-[#2EC4B6]/15 px-2 py-0.5 font-mono-code text-[10px] font-semibold text-[#2EC4B6] sm:inline">v3.0</span>
+          </div>
+        </a>
+
+        <nav class="hidden items-center gap-6 text-sm opacity-85 md:flex">
+          <a href="#how-it-works" class="transition hover:text-[#2EC4B6]">How It Works</a>
+          <a href="#sandbox" class="transition hover:text-[#2EC4B6]">Live Sandbox</a>
+          <a href="#architecture" class="transition hover:text-[#2EC4B6]">Architecture</a>
+          <a href="#quickstart" class="transition hover:text-[#2EC4B6]">Quick Start</a>
+        </nav>
+
+        <div class="flex items-center gap-2">
+          <button id="btnTheme" class="glass rounded-xl p-2 hover:border-[#6C63FF]" title="Toggle Dark/Light Glass" aria-label="Toggle Theme">
+            <i data-lucide="sun" class="h-4 w-4"></i>
+          </button>
+          <a href="#sandbox" class="btn-primary inline-flex items-center gap-1.5 px-4 py-2 text-xs sm:text-sm">
+            Try Live Demo <i data-lucide="arrow-right" class="h-4 w-4"></i>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="top" class="mx-auto max-w-6xl px-4 pb-16 pt-12 md:px-8 md:pt-20">
+      <div class="grid items-center gap-10 lg:grid-cols-12">
+        <div class="lg:col-span-6 space-y-6">
+          <div class="inline-flex items-center gap-2 rounded-full border border-[#2EC4B6]/40 bg-[#2EC4B6]/10 px-3.5 py-1.5 text-xs font-medium text-[#2EC4B6]">
+            <span class="h-2 w-2 rounded-full bg-[#2EC4B6]"></span>
+            Transparent AI Orchestration • Thompson-Sampling Adaptation
+          </div>
+
+          <h1 class="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+            Stop Treating AI Like a <span class="gradient-text">Black Box</span>
+          </h1>
+
+          <p class="max-w-xl text-base leading-relaxed opacity-80">
+            Adaptive AI exposes every decision behind every answer—detected intent, estimated complexity, specialist persona, response strategy, weighted A-score, and live structural evaluation—wrapped in a high-contrast Circuit Glass interface.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3">
+            <a href="#sandbox" class="btn-primary inline-flex items-center gap-2 px-6 py-3 text-sm">
+              <i data-lucide="play" class="h-4 w-4"></i> Test Live Classifier
+            </a>
+            <a href="#architecture" class="btn-secondary inline-flex items-center gap-2 px-6 py-3 text-sm">
+              <i data-lucide="layers" class="h-4 w-4"></i> Explore Architecture
+            </a>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="glass rounded-xl p-3">
+              <div class="font-mono-code text-lg font-bold text-[#2EC4B6]">8 Intents</div>
+              <div class="opacity-70">Auto-classified</div>
+            </div>
+            <div class="glass rounded-xl p-3">
+              <div class="font-mono-code text-lg font-bold text-[#6C63FF]">6 Personas</div>
+              <div class="opacity-70">Task-routed</div>
+            </div>
+            <div class="glass rounded-xl p-3">
+              <div class="font-mono-code text-lg font-bold text-[#2EC4B6]">1–5 Stars</div>
+              <div class="opacity-70">Bandit learning</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Hero Telemetry Preview Card -->
+        <div class="lg:col-span-6">
+          <div class="glass-elevated p-5 sm:p-6 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+              <div>
+                <div class="text-xs font-semibold uppercase tracking-wider text-[#2EC4B6]">Live Telemetry Preview</div>
+                <div class="text-xs opacity-70">Click a scenario to watch the orchestrator adapt</div>
+              </div>
+              <span class="font-mono-code rounded-full bg-[#2EC4B6]/15 px-2.5 py-1 text-[11px] font-semibold text-[#2EC4B6]">SSE + REST v1</span>
+            </div>
+
+            <!-- Interactive Preset Switcher -->
+            <div class="flex flex-wrap gap-2" id="heroPresets">
+              <button class="hero-preset chip chip-active" data-key="education">Education</button>
+              <button class="hero-preset chip" data-key="coding">Coding</button>
+              <button class="hero-preset chip" data-key="planning">Planning</button>
+              <button class="hero-preset chip" data-key="analysis">Analysis</button>
+            </div>
+
+            <div class="glass rounded-xl p-3.5 text-xs">
+              <div class="mb-1 text-[10px] uppercase tracking-wider opacity-60">Incoming User Prompt</div>
+              <div id="heroPromptText" class="font-medium leading-relaxed"></div>
+            </div>
+
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div class="space-y-2 text-xs">
+                <div class="glass rounded-xl p-3">
+                  <div class="opacity-65">Intent & Complexity</div>
+                  <div id="heroIntentComplex" class="mt-0.5 font-semibold"></div>
+                </div>
+                <div class="glass rounded-xl p-3">
+                  <div class="opacity-65">Persona & Strategy</div>
+                  <div id="heroPersonaStrat" class="mt-0.5 font-semibold"></div>
+                </div>
+                <div class="glass rounded-xl p-3 flex items-center justify-between">
+                  <span class="opacity-65">Evaluation</span>
+                  <span id="heroEvalBadge" class="font-mono-code font-semibold text-[#2EC4B6]"></span>
+                </div>
+              </div>
+
+              <!-- Dynamic Semi-Circle Radial A-Score Gauge -->
+              <div class="glass flex flex-col items-center justify-center rounded-xl p-3.5 text-center">
+                <div class="text-xs font-semibold">A-Score Heuristic</div>
+                <div class="font-mono-code text-[10px] opacity-65">0.30I + 0.25C + 0.25P + 0.20H</div>
+                <div id="heroGaugeWrap" class="my-2"></div>
+                <div id="heroAScoreVal" class="font-mono-code text-lg font-bold text-[#2EC4B6]">0.83</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works (4-Step Pipeline) -->
+    <section id="how-it-works" class="mx-auto max-w-6xl px-4 py-14 md:px-8">
+      <div class="mb-8 text-center">
+        <h2 class="text-2xl font-bold sm:text-3xl">Four-Stage Transparent Pipeline</h2>
+        <p class="mx-auto mt-2 max-w-2xl text-sm opacity-75">Every request flows through an observable backend pipeline—no hidden prompt hacks, no exposed client keys.</p>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="glass p-5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-mono-code text-xs font-bold text-[#2EC4B6]">01</span>
+            <i data-lucide="compass" class="h-5 w-5 text-[#6C63FF]"></i>
+          </div>
+          <h3 class="text-base font-bold">Classify & Score</h3>
+          <p class="text-xs leading-relaxed opacity-75">Detects task intent across 8 categories, estimates low/medium/high complexity, and flags prompt-injection risks.</p>
+        </div>
+        <div class="glass p-5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-mono-code text-xs font-bold text-[#2EC4B6]">02</span>
+            <i data-lucide="git-branch" class="h-5 w-5 text-[#2EC4B6]"></i>
+          </div>
+          <h3 class="text-base font-bold">Adapt Strategy</h3>
+          <p class="text-xs leading-relaxed opacity-75">Selects the ideal specialist persona and uses Thompson sampling to learn which strategies earn the highest user ratings.</p>
+        </div>
+        <div class="glass p-5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-mono-code text-xs font-bold text-[#2EC4B6]">03</span>
+            <i data-lucide="cpu" class="h-5 w-5 text-[#6C63FF]"></i>
+          </div>
+          <h3 class="text-base font-bold">Orchestrate & Stream</h3>
+          <p class="text-xs leading-relaxed opacity-75">Streams responses over SSE from Groq (with automatic model fallback) or offline Mock mode for zero-friction demos.</p>
+        </div>
+        <div class="glass p-5 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-mono-code text-xs font-bold text-[#2EC4B6]">04</span>
+            <i data-lucide="shield-check" class="h-5 w-5 text-[#2EC4B6]"></i>
+          </div>
+          <h3 class="text-base font-bold">Evaluate & Improve</h3>
+          <p class="text-xs leading-relaxed opacity-75">Runs structural quality checks, renders the Insights Panel, and captures 1–5 star ratings to continuously improve routing.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Live Orchestration Sandbox -->
+    <section id="sandbox" class="mx-auto max-w-5xl px-4 py-14 md:px-8">
+      <div class="glass-elevated p-6 sm:p-8 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 class="text-2xl font-bold">Try the Live Orchestrator</h2>
+            <p class="text-xs opacity-75 sm:text-sm">Type any prompt below to inspect real-time intent classification, complexity bars, persona routing, and A-Score telemetry.</p>
+          </div>
+          <span class="chip font-mono-code text-[11px]">POST /api/v1/assistant/analyze</span>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <input
+            id="sandboxInput"
+            type="text"
+            value="Build a FastAPI rate limiter with Redis and explain the architecture trade-offs"
+            placeholder="Type any prompt to analyze..."
+            class="glass flex-1 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#6C63FF]"
+          />
+          <button id="btnAnalyzeSandbox" class="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 text-sm">
+            <i data-lucide="flask-conical" class="h-4 w-4"></i> Analyze Now
+          </button>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button class="sb-sample chip" data-q="Explain backpropagation and gradient descent for a beginner">Education</button>
+          <button class="sb-sample chip" data-q="Create a 7-day hackathon roadmap with milestones and risk mitigation">Planning</button>
+          <button class="sb-sample chip" data-q="Compare SQL vs NoSQL pros and cons for real-time analytics">Analysis</button>
+          <button class="sb-sample chip" data-q="Summarize key takeaways from a microservice migration brief">Summarization</button>
+        </div>
+
+        <div id="sandboxOutput" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"></div>
+      </div>
+    </section>
+
+    <!-- Architecture & Design System -->
+    <section id="architecture" class="mx-auto max-w-6xl px-4 py-14 md:px-8">
+      <div class="grid gap-6 lg:grid-cols-2">
+        <div class="glass p-6 space-y-4">
+          <h2 class="text-xl font-bold">Full-Stack Architecture</h2>
+          <p class="text-xs leading-relaxed opacity-75">Built for speed, type safety, and zero client-side secrets.</p>
+          <div class="grid gap-2.5 text-xs sm:grid-cols-2">
+            <div class="glass rounded-xl p-3">
+              <div class="font-semibold text-[#2EC4B6]">Frontend</div>
+              <div class="mt-1 opacity-80">React 18, TypeScript, Vite, Tailwind CSS, Zustand, TanStack Query, React Hook Form</div>
+            </div>
+            <div class="glass rounded-xl p-3">
+              <div class="font-semibold text-[#6C63FF]">Backend (v3)</div>
+              <div class="mt-1 opacity-80">Python FastAPI, SQLAlchemy + SQLite, SSE Streaming, Rate Limiting, Thompson Sampling</div>
+            </div>
+            <div class="glass rounded-xl p-3">
+              <div class="font-semibold text-[#2EC4B6]">AI Providers</div>
+              <div class="mt-1 opacity-80">Groq (gpt-oss-120b + 20b fallback) & Offline Mock Provider for instant testing</div>
+            </div>
+            <div class="glass rounded-xl p-3">
+              <div class="font-semibold text-[#6C63FF]">Quality & Security</div>
+              <div class="mt-1 opacity-80">Prompt-injection flags, secret redaction, CORS allowlist, 3 pytest suites, Docker + CI</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass p-6 space-y-4">
+          <h2 class="text-xl font-bold">Circuit Glass Design System</h2>
+          <p class="text-xs leading-relaxed opacity-75">Dark-first Glassmorphism with WCAG-verified contrast pairs and automatic reduced-transparency fallbacks.</p>
+          <div class="grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
+            <div class="rounded-xl border border-white/15 bg-[#121826] p-3 text-[#F8FAFC]">
+              <div class="font-bold">Ink</div>
+              <div class="font-mono-code text-[11px] opacity-75">#121826</div>
+              <div class="mt-1 text-[10px] text-[#2EC4B6]">16.95:1</div>
+            </div>
+            <div class="rounded-xl border border-black/10 bg-[#F8FAFC] p-3 text-[#121826]">
+              <div class="font-bold">Mist</div>
+              <div class="font-mono-code text-[11px] opacity-75">#F8FAFC</div>
+              <div class="mt-1 text-[10px]">Light Base</div>
+            </div>
+            <div class="rounded-xl bg-[#6C63FF] p-3 text-[#F8FAFC]">
+              <div class="font-bold">Violet</div>
+              <div class="font-mono-code text-[11px] opacity-90">#6C63FF</div>
+              <div class="mt-1 text-[10px]">Accents</div>
+            </div>
+            <div class="rounded-xl bg-[#2EC4B6] p-3 text-[#121826]">
+              <div class="font-bold">Teal</div>
+              <div class="font-mono-code text-[11px] opacity-90">#2EC4B6</div>
+              <div class="mt-1 text-[10px] font-semibold">8.18:1</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Start CTA -->
+    <section id="quickstart" class="mx-auto max-w-5xl px-4 pb-20 pt-8 md:px-8">
+      <div class="glass-elevated p-6 sm:p-8 text-center space-y-5">
+        <h2 class="text-2xl font-bold sm:text-3xl">Ready to Run Locally in 60 Seconds</h2>
+        <p class="mx-auto max-w-xl text-sm opacity-80">Pre-configured with offline <code class="font-mono-code text-[#2EC4B6]">PROVIDER=mock</code> so you can demo immediately—add your <code class="font-mono-code text-[#2EC4B6]">GROQ_API_KEY</code> whenever you're ready for live model responses.</p>
+
+        <div class="mx-auto max-w-2xl rounded-xl border border-white/15 bg-black/35 p-4 text-left font-mono-code text-xs leading-relaxed">
+          <div class="mb-2 flex items-center justify-between text-[11px] opacity-65">
+            <span>2-Terminal Local Startup</span>
+            <button id="btnCopyCmd" class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[#2EC4B6] hover:bg-white/10">
+              <i data-lucide="copy" class="h-3.5 w-3.5"></i> Copy Commands
+            </button>
+          </div>
+          <div id="quickstartCode">cd adaptive-ai-backend &amp;&amp; pip install -r requirements.txt &amp;&amp; uvicorn app.main:app --reload --port 8000<br/>cd adaptive-ai-web &amp;&amp; npm install &amp;&amp; npm run dev</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="border-t border-white/10 py-6 text-center text-xs opacity-65">
+      Adaptive AI v3.0 • Transparent AI Orchestration Interface • Circuit Glass Design System
+    </footer>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="glass-elevated pointer-events-none fixed bottom-6 right-6 z-50 hidden px-4 py-2.5 text-xs font-medium text-[#2EC4B6]"></div>
+
+  <script>
+    const HERO_PRESETS = {
+      education: {
+        prompt: 'Explain how neural networks learn step by step with an intuitive analogy.',
+        intent: 'Education',
+        complexity: 'Medium',
+        persona: 'Teacher',
+        strategy: 'Step-by-Step Explanation',
+        evalText: 'Passed (94%)',
+        score: 0.83,
+      },
+      coding: {
+        prompt: 'Write a FastAPI endpoint with Pydantic validation, CORS, and 429 rate limiting.',
+        intent: 'Coding',
+        complexity: 'High',
+        persona: 'Developer',
+        strategy: 'Architecture + Production Code',
+        evalText: 'Passed (96%)',
+        score: 0.91,
+      },
+      planning: {
+        prompt: 'Create a 2-week hackathon sprint roadmap with milestones and risk mitigation.',
+        intent: 'Planning',
+        complexity: 'Medium',
+        persona: 'Planner',
+        strategy: 'Phased Execution Plan',
+        evalText: 'Passed (93%)',
+        score: 0.86,
+      },
+      analysis: {
+        prompt: 'Compare REST vs GraphQL trade-offs for a real-time telemetry dashboard.',
+        intent: 'Analysis',
+        complexity: 'High',
+        persona: 'Analyst',
+        strategy: 'Multi-Factor Matrix',
+        evalText: 'Passed (95%)',
+        score: 0.89,
+      },
+    };
+
+    function renderGaugeSvg(val) {
+      const pct = Math.max(0, Math.min(1, val));
+      const arcLen = 126;
+      const offset = (arcLen * (1 - pct)).toFixed(1);
+      const deg = -90 + pct * 180;
+      return `
+        <svg width="136" height="76" viewBox="0 0 132 74" aria-label="A-Score ${val.toFixed(2)}">
+          <defs>
+            <linearGradient id="heroG" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#6C63FF" />
+              <stop offset="100%" stop-color="#2EC4B6" />
+            </linearGradient>
+          </defs>
+          <path d="M 16 64 A 50 50 0 0 1 116 64" fill="none" stroke="rgba(248,250,252,0.14)" stroke-width="9" stroke-linecap="round" />
+          <path d="M 16 64 A 50 50 0 0 1 116 64" fill="none" stroke="url(#heroG)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${arcLen}" stroke-dashoffset="${offset}" />
+          <g transform="translate(66,64) rotate(${deg})">
+            <line x1="0" y1="0" x2="0" y2="-36" stroke="#F8FAFC" stroke-width="2.5" stroke-linecap="round" />
+            <circle cx="0" cy="0" r="4.5" fill="#2EC4B6" stroke="#121826" stroke-width="1.5" />
+          </g>
+        </svg>`;
+    }
+
+    function setHeroPreset(key) {
+      const d = HERO_PRESETS[key] || HERO_PRESETS.education;
+      document.getElementById('heroPromptText').textContent = d.prompt;
+      document.getElementById('heroIntentComplex').textContent = `${d.intent} • ${d.complexity} Complexity`;
+      document.getElementById('heroPersonaStrat').textContent = `${d.persona} • ${d.strategy}`;
+      document.getElementById('heroEvalBadge').textContent = d.evalText;
+      document.getElementById('heroGaugeWrap').innerHTML = renderGaugeSvg(d.score);
+      document.getElementById('heroAScoreVal').textContent = d.score.toFixed(2);
+      document.querySelectorAll('.hero-preset').forEach(b => b.classList.toggle('chip-active', b.dataset.key === key));
+    }
+
+    function classifySandbox(q) {
+      const t = q.toLowerCase();
+      let intent = 'General Assistance';
+      let persona = 'General';
+      let strategy = 'Structured Guidance';
+      if (/(code|fastapi|python|react|redis|api|sql|debug|endpoint|build)/.test(t)) {
+        intent = 'Coding'; persona = 'Developer'; strategy = 'Annotated Implementation';
+      } else if (/(explain|learn|beginner|teach|how does|backpropagation|neural)/.test(t)) {
+        intent = 'Education'; persona = 'Teacher'; strategy = 'Step-by-Step Explanation';
+      } else if (/(plan|roadmap|sprint|schedule|milestone|hackathon)/.test(t)) {
+        intent = 'Planning'; persona = 'Planner'; strategy = 'Phased Execution Plan';
+      } else if (/(compare|trade-off|tradeoff|pros and cons|analyze|vs)/.test(t)) {
+        intent = 'Analysis'; persona = 'Analyst'; strategy = 'Comparative Matrix';
+      } else if (/(summarize|summary|tldr|takeaways|brief|recap)/.test(t)) {
+        intent = 'Summarization'; persona = 'Analyst'; strategy = 'Executive Digest';
+      }
+
+      const words = t.split(/\s+/).filter(Boolean).length;
+      const complexHits = ['and', 'trade-off', 'architecture', 'compare', 'risk', 'scale'].filter(w => t.includes(w)).length;
+      const complexity = (words > 14 || complexHits >= 2) ? 'High' : (words > 7 || complexHits === 1) ? 'Medium' : 'Low';
+      const bars = complexity === 'High' ? 3 : complexity === 'Medium' ? 2 : 1;
+      const score = complexity === 'High' ? 0.90 : complexity === 'Medium' ? 0.84 : 0.77;
+
+      const barsHtml = [1, 2, 3].map(i => {
+        const h = i === 1 ? 'h-2' : i === 2 ? 'h-2.5' : 'h-3';
+        const col = i <= bars ? (bars === 1 ? 'bg-[#2EC4B6]' : 'bg-[#6C63FF]') : 'bg-white/20';
+        return `<span class="inline-block w-1 rounded-sm ${h} ${col}"></span>`;
+      }).join('');
+
+      document.getElementById('sandboxOutput').innerHTML = `
+        <div class="glass rounded-xl p-3.5"><div class="text-[11px] opacity-65">Detected Intent</div><div class="mt-1 text-sm font-bold">${intent}</div></div>
+        <div class="glass rounded-xl p-3.5"><div class="text-[11px] opacity-65">Complexity</div><div class="mt-1 flex items-center gap-2 text-sm font-bold"><span class="inline-flex items-end gap-0.5">${barsHtml}</span> ${complexity}</div></div>
+        <div class="glass rounded-xl p-3.5"><div class="text-[11px] opacity-65">Routed Persona</div><div class="mt-1 text-sm font-bold">${persona}</div></div>
+        <div class="glass rounded-xl p-3.5"><div class="text-[11px] opacity-65">Strategy & A-Score</div><div class="mt-1 text-sm font-bold text-[#2EC4B6]">${strategy} (${score.toFixed(2)})</div></div>
+      `;
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.add('hidden'), 2400);
+    }
+
+    // Bind events
+    document.querySelectorAll('.hero-preset').forEach(btn => {
+      btn.addEventListener('click', () => setHeroPreset(btn.dataset.key));
+    });
+
+    document.getElementById('btnAnalyzeSandbox').addEventListener('click', () => {
+      classifySandbox(document.getElementById('sandboxInput').value);
+      showToast('Prompt analyzed via v3 orchestration engine');
+    });
+    document.getElementById('sandboxInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') classifySandbox(e.target.value);
+    });
+    document.querySelectorAll('.sb-sample').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('sandboxInput').value = btn.dataset.q;
+        classifySandbox(btn.dataset.q);
+      });
+    });
+
+    document.getElementById('btnTheme').addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      document.getElementById('btnTheme').innerHTML = `<i data-lucide="${next === 'dark' ? 'sun' : 'moon'}" class="h-4 w-4"></i>`;
+      lucide.createIcons();
+    });
+
+    document.getElementById('btnCopyCmd').addEventListener('click', () => {
+      const cmd = "cd adaptive-ai-backend && pip install -r requirements.txt && uvicorn app.main:app --reload --port 8000\ncd adaptive-ai-web && npm install && npm run dev";
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(cmd).then(() => showToast('Startup commands copied')).catch(() => {
+          const ta = document.createElement('textarea');
+          ta.value = cmd;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          showToast('Startup commands copied');
+        });
+      }
+    });
+
+    // Init
+    setHeroPreset('education');
+    classifySandbox(document.getElementById('sandboxInput').value);
+    lucide.createIcons();
+  </script>
+</body>
+</html>

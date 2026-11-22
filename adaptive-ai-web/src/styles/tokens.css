@@ -1,0 +1,35 @@
+:root {
+  --violet: #6C63FF;
+  --ink: #121826;
+  --mist: #F8FAFC;
+  --teal: #2EC4B6;
+
+  --bg: var(--ink);
+  --text: var(--mist);
+  --text-muted: rgba(248, 250, 252, 0.72);
+  --glass-bg: rgba(248, 250, 252, 0.06);
+  --glass-bg-strong: rgba(248, 250, 252, 0.10);
+  --glass-bg-overlay: rgba(18, 24, 38, 0.82);
+  --glass-border: rgba(248, 250, 252, 0.14);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --glass-blur: 16px;
+  --glass-blur-overlay: 24px;
+  --radius: 16px;
+}
+
+[data-theme='light'] {
+  --bg: var(--mist);
+  --text: var(--ink);
+  --text-muted: rgba(18, 24, 38, 0.68);
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-strong: rgba(255, 255, 255, 0.75);
+  --glass-bg-overlay: rgba(248, 250, 252, 0.90);
+  --glass-border: rgba(18, 24, 38, 0.10);
+  --glass-shadow: 0 8px 32px rgba(18, 24, 38, 0.12);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --glass-blur: 12px;
+  }
+}
