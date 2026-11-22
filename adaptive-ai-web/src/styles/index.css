@@ -2,6 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
-@import './tokens.css';
-@import './glass.css';
-@import './background.css';
+.circuit-backdrop {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.circuit-backdrop svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.42;
+}
+[data-theme='light'] .circuit-backdrop svg {
+  opacity: 0.14;
+}
+.circuit-core-glow {
+  position: absolute;
+  top: 46%;
+  left: 48%;
+  width: 340px;
+  height: 240px;
+  transform: translate(-50%, -50%);
+  border-radius: 28px;
+  background: radial-gradient(circle, rgba(46, 196, 182, 0.28) 0%, rgba(108, 99, 255, 0.22) 55%, transparent 78%);
+  filter: blur(36px);
+  border: 1px solid rgba(46, 196, 182, 0.18);
+}
+.assistant-glass {
+  border-color: rgba(108, 99, 255, 0.38);
+  border-top-color: rgba(46, 196, 182, 0.55);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.44), 0 0 28px rgba(46, 196, 182, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+.nav-active-glass {
+  background: linear-gradient(135deg, rgba(46, 196, 182, 0.16) 0%, rgba(108, 99, 255, 0.22) 100%);
+  border: 1px solid rgba(108, 99, 255, 0.55);
+  border-left: 3px solid #2EC4B6;
+  box-shadow: 0 4px 18px rgba(108, 99, 255, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  font-weight: 600;
+}
