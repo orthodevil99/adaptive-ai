@@ -14,7 +14,9 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_json: bool = False
     docs_enabled: bool | None = None  # default: on in dev/test, off in production
-    cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+    # Deployed frontend is allowed by default so the live Vercel frontend and
+    # backend work without env setup; an explicit CORS_ORIGINS env var overrides.
+    cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000,https://adaptive-ai-web-xi.vercel.app"
     max_body_bytes: int = Field(default=65536, ge=1024, le=10_000_000)
 
     # --- access control --------------------------------------------------

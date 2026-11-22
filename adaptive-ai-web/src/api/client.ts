@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+// Default to the deployed Vercel backend; VITE_API_BASE_URL still overrides (e.g. localhost dev).
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://adaptive-ai-backend-nine.vercel.app';
 const API_KEY = import.meta.env.VITE_API_KEY || '';
 const REQUEST_TIMEOUT_MS = Number(import.meta.env.VITE_REQUEST_TIMEOUT_MS || 60000);
 
