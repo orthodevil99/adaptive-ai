@@ -23,7 +23,7 @@ export const MessageBubble: React.FC<Props> = React.memo(({ message, onInspect, 
       >
         <div className="mb-1 flex items-center justify-between text-[11px] uppercase tracking-wider opacity-60">
           <span>{isUser ? 'You' : 'Adaptive AI'}</span>
-          {message.latency_ms && <span className="font-mono">{message.latency_ms} ms</span>}
+          {message.meta?.latency_ms && <span className="font-mono">{message.meta.latency_ms} ms</span>}
         </div>
 
         <div className="prose prose-invert max-w-none text-sm leading-relaxed">
